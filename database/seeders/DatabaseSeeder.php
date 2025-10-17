@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         // Run seeders in order
         $this->call([
             UserSeeder::class,
-            CarSeeder::class,
+            MobilSeeder::class,
             PelangganSeeder::class,
             JenisSewaSeeder::class,
             HargaSewaSeeder::class,

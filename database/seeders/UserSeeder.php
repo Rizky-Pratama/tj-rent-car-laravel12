@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     $users = [
       [
         'nama' => 'Admin TJ Rent Car',
-        'email' => 'admin@tjrentcar.com',
+        'email' => 'admin@admin.com',
         'password' => Hash::make('password'),
         'telepon' => '08123456789',
         'alamat' => 'Jl. Merdeka No. 123, Jakarta',
@@ -36,8 +36,6 @@ class UserSeeder extends Seeder
         'created_at' => now(),
         'updated_at' => now(),
       ],
-
-
     ];
 
     foreach ($users as $user) {

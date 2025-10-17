@@ -20,9 +20,7 @@ return new class extends Migration
             $table->date('tanggal_lahir')->nullable();
             $table->enum('jenis_kelamin', ['laki-laki', 'perempuan'])->nullable();
             $table->string('no_ktp', 20)->unique();
-            $table->string('foto_ktp')->nullable();
             $table->string('no_sim', 20)->nullable();
-            $table->string('foto_sim')->nullable();
             $table->string('pekerjaan')->nullable();
             $table->text('catatan')->nullable();
             $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
