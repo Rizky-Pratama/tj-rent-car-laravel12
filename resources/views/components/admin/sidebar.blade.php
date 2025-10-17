@@ -34,62 +34,62 @@
                 </h3>
                 <div class="space-y-1">
                     <!-- Pengguna -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
+                    <a href="{{ route('admin.users.index') }}"
+                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group {{ request()->routeIs('admin.users.*') ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : '' }}">
                         <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
+                            class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white' }} transition-colors duration-200">
                             <iconify-icon icon="heroicons:users-20-solid" class="w-5 h-5"></iconify-icon>
                         </div>
                         <span class="ml-3 font-medium">Pengguna</span>
                     </a>
                     <!-- Pelanggan -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
+                    <a href="{{ route('admin.pelanggan.index') }}"
+                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group {{ request()->routeIs('admin.pelanggan.*') ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : '' }}">
                         <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
+                            class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.pelanggan.*') ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white' }} transition-colors duration-200">
                             <iconify-icon icon="heroicons:user-group-20-solid" class="w-5 h-5"></iconify-icon>
                         </div>
                         <span class="ml-3 font-medium">Pelanggan</span>
                     </a>
 
-                    <!-- Mobil -->
-                    <a href="{{ route('admin.cars.index') }}"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group {{ request()->routeIs('admin.cars.*') ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : '' }}">
+                    <!-- Mobil & Harga -->
+                    <a href="{{ route('admin.mobil.index') }}"
+                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group {{ request()->routeIs('admin.mobil.*') || request()->routeIs('admin.harga-sewa.*') ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : '' }}">
                         <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.cars.*') ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white' }} transition-colors duration-200">
+                            class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.mobil.*') || request()->routeIs('admin.harga-sewa.*') ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white' }} transition-colors duration-200">
                             <iconify-icon icon="heroicons:truck-20-solid" class="w-5 h-5"></iconify-icon>
                         </div>
-                        <span class="ml-3 font-medium">Mobil</span>
+                        <span class="ml-3 font-medium">Mobil & Harga</span>
                     </a>
 
                     <!-- Sopir -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
+                    <a href="{{ route('admin.sopir.index') }}"
+                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group {{ request()->routeIs('admin.sopir.*') ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : '' }}">
                         <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
+                            class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.sopir.*') ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white' }} transition-colors duration-200">
                             <iconify-icon icon="heroicons:identification-20-solid" class="w-5 h-5"></iconify-icon>
                         </div>
                         <span class="ml-3 font-medium">Sopir</span>
                     </a>
 
-                    <!-- Harga Sewa -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
+                    <!-- Jenis Sewa -->
+                    <a href="{{ route('admin.jenis-sewa.index') }}"
+                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group {{ request()->routeIs('admin.jenis-sewa.*') ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : '' }}">
                         <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:currency-dollar-20-solid" class="w-5 h-5"></iconify-icon>
+                            class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.jenis-sewa.*') ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white' }} transition-colors duration-200">
+                            <iconify-icon icon="heroicons:document-text-20-solid" class="w-5 h-5"></iconify-icon>
                         </div>
-                        <span class="ml-3 font-medium">Harga Sewa</span>
+                        <span class="ml-3 font-medium">Jenis Sewa</span>
                     </a>
 
-                    <!-- Jadwal Mobil -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
+                    <!-- Jadwal & Ketersediaan -->
+                    <a href="{{ route('admin.jadwal.index') }}"
+                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group {{ request()->routeIs('admin.jadwal.*') ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : '' }}">
                         <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
+                            class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.jadwal.*') ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white' }} transition-colors duration-200">
                             <iconify-icon icon="heroicons:calendar-days-20-solid" class="w-5 h-5"></iconify-icon>
                         </div>
-                        <span class="ml-3 font-medium">Jadwal Mobil</span>
+                        <span class="ml-3 font-medium text-sm">Jadwal & Ketersediaan</span>
                     </a>
                 </div>
             </div>
@@ -100,35 +100,25 @@
                     Transaksi
                 </h3>
                 <div class="space-y-1">
-                    <!-- Rental -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
+                    <!-- Kelola Transaksi -->
+                    <a href="{{ route('admin.transaksi.index') }}"
+                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group {{ request()->routeIs('admin.transaksi.*') ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : '' }}">
                         <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
+                            class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.transaksi.*') ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white' }} transition-colors duration-200">
                             <iconify-icon icon="heroicons:clipboard-document-list-20-solid"
                                 class="w-5 h-5"></iconify-icon>
                         </div>
-                        <span class="ml-3 font-medium">Rental</span>
+                        <span class="ml-3 font-medium">Kelola Transaksi</span>
                     </a>
 
                     <!-- Pembayaran -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
+                    <a href="{{ route('admin.pembayaran.index') }}"
+                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group {{ request()->routeIs('admin.pembayaran.*') ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-sm' : '' }}">
                         <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
+                            class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.pembayaran.*') ? 'bg-indigo-500 text-white' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white' }} transition-colors duration-200">
                             <iconify-icon icon="heroicons:credit-card-20-solid" class="w-5 h-5"></iconify-icon>
                         </div>
                         <span class="ml-3 font-medium">Pembayaran</span>
-                    </a>
-
-                    <!-- Pengembalian -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:arrow-uturn-left-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Pengembalian</span>
                     </a>
                 </div>
             </div>
@@ -191,63 +181,6 @@
                 </div>
             </div>
 
-            <!-- Sistem -->
-            <div>
-                <h3 class="px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                    Sistem
-                </h3>
-                <div class="space-y-1">
-                    <!-- Pengguna -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:users-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Pengguna</span>
-                    </a>
-
-                    <!-- Pengaturan -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:cog-6-tooth-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Pengaturan</span>
-                    </a>
-
-                    <!-- Backup Data -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:cloud-arrow-down-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Backup Data</span>
-                    </a>
-
-                    <!-- Restore Data -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:cloud-arrow-up-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Restore Data</span>
-                    </a>
-
-                    <!-- Log Sistem -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:document-text-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Log Sistem</span>
-                    </a>
-                </div>
-            </div>
         </div>
 
         <!-- Bottom padding for better scroll -->

@@ -1,0 +1,251 @@
+@extends('layouts.admin')
+
+@section('title', 'Edit Pembayaran')
+@section('page-title', 'Edit Pembayaran')
+@section('page-subtitle', 'Edit data pembayaran transaksi')
+
+@section('content')
+    <div class="max-w-4xl mx-auto">
+        <form action="{{ route('admin.pembayaran.update', $pembayaran->id) }}" method="POST" enctype="multipart/form-data"
+            class="space-y-6">
+            @csrf
+            @method('PUT')
+
+            <!-- Info Transaksi -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex items-center mb-6">
+                    <div class="flex-shrink-0">
+                        <div
+                            class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <iconify-icon icon="heroicons:document-text-20-solid" class="w-5 h-5 text-white"></iconify-icon>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Info Transaksi</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Detail transaksi terkait pembayaran</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Info Transaksi -->
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-xl border border-gray-200 dark:border-gray-600">
+                            <h4 class="font-medium text-gray-900 dark:text-white mb-3">Detail Transaksi</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400">No. Transaksi:</span>
+                                    <span
+                                        class="font-medium text-gray-900 dark:text-white">{{ $pembayaran->transaksi->no_transaksi }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400">Pelanggan:</span>
+                                    <span
+                                        class="font-medium text-gray-900 dark:text-white">{{ $pembayaran->transaksi->pelanggan->nama }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400">Mobil:</span>
+                                    <span
+                                        class="font-medium text-gray-900 dark:text-white">{{ $pembayaran->transaksi->mobil->merk }}
+                                        {{ $pembayaran->transaksi->mobil->model }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Pembayaran -->
+                    <div class="space-y-4">
+                        <div
+                            class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                            <h4 class="font-medium text-gray-900 dark:text-white mb-3">Status Pembayaran</h4>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400">Total Tagihan:</span>
+                                    <span class="font-bold text-gray-900 dark:text-white">Rp
+                                        {{ number_format($pembayaran->transaksi->total, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600 dark:text-gray-400">Sudah Dibayar:</span>
+                                    <span class="font-medium text-green-600 dark:text-green-400">Rp
+                                        {{ number_format($pembayaran->transaksi->total_pembayaran, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between border-t border-blue-200 dark:border-blue-700 pt-2">
+                                    <span class="text-gray-600 dark:text-gray-400">Sisa Tagihan:</span>
+                                    <span class="font-bold text-red-600 dark:text-red-400">Rp
+                                        {{ number_format($pembayaran->transaksi->sisa_pembayaran + $pembayaran->jumlah, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Edit Pembayaran -->
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                <div class="flex items-center mb-6">
+                    <div class="flex-shrink-0">
+                        <div
+                            class="w-10 h-10 bg-gradient-to-r from-green-500 to-blue-600 rounded-lg flex items-center justify-center">
+                            <iconify-icon icon="heroicons:credit-card-20-solid" class="w-5 h-5 text-white"></iconify-icon>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Edit Pembayaran</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Ubah detail pembayaran</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Jumlah Pembayaran -->
+                    <div>
+                        <label for="jumlah" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Jumlah Pembayaran *
+                        </label>
+                        <input type="number" name="jumlah" id="jumlah" value="{{ old('jumlah', $pembayaran->jumlah) }}"
+                            max="{{ $pembayaran->transaksi->sisa_pembayaran + $pembayaran->jumlah }}" min="1"
+                            step="1000" required
+                            class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        @error('jumlah')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            Maksimal: Rp
+                            {{ number_format($pembayaran->transaksi->sisa_pembayaran + $pembayaran->jumlah, 0, ',', '.') }}
+                        </p>
+                    </div>
+
+                    <!-- Metode Pembayaran -->
+                    <div>
+                        <label for="metode" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Metode Pembayaran *
+                        </label>
+                        <select name="metode" id="metode" required
+                            class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="">Pilih metode pembayaran</option>
+                            <option value="tunai" {{ old('metode', $pembayaran->metode) === 'tunai' ? 'selected' : '' }}>
+                                Tunai</option>
+                            <option value="transfer"
+                                {{ old('metode', $pembayaran->metode) === 'transfer' ? 'selected' : '' }}>Transfer Bank
+                            </option>
+                            <option value="qris" {{ old('metode', $pembayaran->metode) === 'qris' ? 'selected' : '' }}>
+                                QRIS</option>
+                            <option value="kartu" {{ old('metode', $pembayaran->metode) === 'kartu' ? 'selected' : '' }}>
+                                Kartu Debit/Kredit</option>
+                            <option value="ewallet"
+                                {{ old('metode', $pembayaran->metode) === 'ewallet' ? 'selected' : '' }}>E-Wallet</option>
+                        </select>
+                        @error('metode')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Status Pembayaran -->
+                    <div>
+                        <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Status Pembayaran *
+                        </label>
+                        <select name="status" id="status" required
+                            class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <option value="pending"
+                                {{ old('status', $pembayaran->status) === 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="terkonfirmasi"
+                                {{ old('status', $pembayaran->status) === 'terkonfirmasi' ? 'selected' : '' }}>
+                                Terkonfirmasi</option>
+                            <option value="gagal" {{ old('status', $pembayaran->status) === 'gagal' ? 'selected' : '' }}>
+                                Gagal</option>
+                            <option value="refund" {{ old('status', $pembayaran->status) === 'refund' ? 'selected' : '' }}>
+                                Refund</option>
+                        </select>
+                        @error('status')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Tanggal Pembayaran -->
+                    <div>
+                        <label for="tanggal_bayar" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Tanggal Pembayaran *
+                        </label>
+                        <input type="datetime-local" name="tanggal_bayar" id="tanggal_bayar"
+                            value="{{ old('tanggal_bayar', $pembayaran->tanggal_bayar ? $pembayaran->tanggal_bayar->format('Y-m-d\TH:i') : '') }}"
+                            required
+                            class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        @error('tanggal_bayar')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Bukti Pembayaran Saat Ini -->
+                    @if ($pembayaran->bukti_bayar)
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Bukti Pembayaran Saat Ini
+                            </label>
+                            <div class="flex items-center space-x-4">
+                                <img src="{{ asset('storage/' . $pembayaran->bukti_bayar) }}" alt="Bukti Pembayaran"
+                                    class="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600">
+                                <div class="text-sm text-gray-600 dark:text-gray-400">
+                                    <p>File saat ini: {{ basename($pembayaran->bukti_bayar) }}</p>
+                                    <p class="mt-1">Upload file baru untuk mengubah bukti pembayaran</p>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Upload Bukti Pembayaran Baru -->
+                    <div class="lg:col-span-2">
+                        <label for="bukti_bayar" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {{ $pembayaran->bukti_bayar ? 'Ubah Bukti Pembayaran' : 'Bukti Pembayaran' }}
+                        </label>
+                        <input type="file" name="bukti_bayar" id="bukti_bayar" accept="image/*"
+                            class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        @error('bukti_bayar')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            Upload gambar bukti pembayaran (JPG, PNG, maksimal 2MB)
+                        </p>
+                    </div>
+
+                    <!-- Catatan -->
+                    <div class="lg:col-span-2">
+                        <label for="catatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Catatan
+                        </label>
+                        <textarea name="catatan" id="catatan" rows="3" placeholder="Catatan tambahan tentang pembayaran ini..."
+                            class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">{{ old('catatan', $pembayaran->catatan) }}</textarea>
+                        @error('catatan')
+                            <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-end">
+                <a href="{{ route('admin.pembayaran.show', $pembayaran->id) }}"
+                    class="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 font-medium transition-colors duration-200 text-center">
+                    Batal
+                </a>
+                <button type="submit"
+                    class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors duration-200">
+                    <iconify-icon icon="heroicons:check-20-solid" class="w-4 h-4 mr-2 inline"></iconify-icon>
+                    Update Pembayaran
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @push('scripts')
+        <script>
+            // Auto format currency input
+            document.getElementById('jumlah').addEventListener('input', function(e) {
+                let value = e.target.value.replace(/[^\d]/g, '');
+                if (value) {
+                    // Update the placeholder or helper text to show formatted value
+                    const formatted = 'Rp ' + parseInt(value).toLocaleString('id-ID');
+                    console.log('Formatted:', formatted);
+                }
+            });
+        </script>
+    @endpush
+@endsection
