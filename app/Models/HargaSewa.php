@@ -16,16 +16,12 @@ class HargaSewa extends Model
         'jenis_sewa_id',
         'harga_per_hari',
         'aktif',
-        'catatan',
+        'catatan'
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'harga_per_hari' => 'integer',
-            'aktif' => 'boolean',
-        ];
-    }
+    protected $casts = [
+        'aktif' => 'boolean'
+    ];
 
     // Relationships
     public function mobil()

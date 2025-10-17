@@ -20,9 +20,7 @@ class Pelanggan extends Model
         'tanggal_lahir',
         'jenis_kelamin',
         'no_ktp',
-        'foto_ktp',
         'no_sim',
-        'foto_sim',
         'pekerjaan',
         'catatan',
         'status',
@@ -42,16 +40,6 @@ class Pelanggan extends Model
     }
 
     // Accessors
-    public function getFotoKtpUrlAttribute()
-    {
-        return $this->foto_ktp ? asset('storage/' . $this->foto_ktp) : null;
-    }
-
-    public function getFotoSimUrlAttribute()
-    {
-        return $this->foto_sim ? asset('storage/' . $this->foto_sim) : null;
-    }
-
     public function getUmurAttribute()
     {
         return $this->tanggal_lahir ? $this->tanggal_lahir->age : null;
