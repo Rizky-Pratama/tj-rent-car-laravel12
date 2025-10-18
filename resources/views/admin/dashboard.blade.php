@@ -2,24 +2,35 @@
 
 @section('title', 'Dashboard')
 @section('page-title', 'Dashboard')
-@section('page-subtitle', 'Welcome back! Here\'s what\'s happening with your rental business.')
+@section('page-subtitle', 'Selamat datang! Berikut adalah ringkasan bisnis rental mobil Anda.')
 
 @section('content')
 
     <x-admin.breadcrumb :breadcrumbs="[['title' => 'Dashboard', 'url' => route('admin.dashboard')]]" />
+
     <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <x-admin.stat-card title="Total Users" :value="$stats['total_users']" color="blue" trend="up" trendValue="12"
+        <x-admin.stat-card title="Total Pengguna" :value="$stats['total_pengguna']" color="blue" trend="up"
             icon="heroicons:users-20-solid" />
 
-        <x-admin.stat-card title="Total Orders" :value="$stats['total_orders']" color="emerald" trend="up" trendValue="8"
-            icon="heroicons:shopping-bag-20-solid" />
+        <x-admin.stat-card title="Total Pelanggan" :value="$stats['total_pelanggan']" color="emerald" trend="up"
+            icon="heroicons:user-group-20-solid" />
 
-        <x-admin.stat-card title="Total Revenue" :value="$stats['revenue']" color="purple" trend="up" trendValue="23"
+        <x-admin.stat-card title="Total Transaksi" :value="$stats['total_transaksi']" color="indigo" trend="up"
+            icon="heroicons:clipboard-document-list-20-solid" />
+
+        {{-- <x-admin.stat-card title="Pendapatan Bulan Ini" :value="'Rp ' . number_format($stats['pendapatan_bulan_ini'], 0, ',', '.')" color="purple" trend="up" --}}
+        <x-admin.stat-card title="Pendapatan Bulan Ini" :value="$stats['pendapatan_bulan_ini']" color="purple" trend="up"
             icon="heroicons:banknotes-20-solid" />
+    </div>
 
-        <x-admin.stat-card title="Pending Orders" :value="$stats['pending_orders']" color="amber" trend="down" trendValue="5"
+    <!-- Additional Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <x-admin.stat-card title="Transaksi Pending" :value="$stats['transaksi_pending']" color="amber" trend="neutral"
             icon="heroicons:clock-20-solid" />
+
+        <x-admin.stat-card title="Transaksi Berjalan" :value="$stats['transaksi_berjalan']" color="blue" trend="neutral"
+            icon="heroicons:arrow-path-20-solid" />
     </div>
 
     <!-- Charts and Recent Activity -->
@@ -29,16 +40,16 @@
             class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Revenue Overview</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Last 7 days performance</p>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Grafik Pendapatan</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Performa 7 hari terakhir</p>
                 </div>
                 <div class="flex space-x-2">
                     <button
-                        class="px-3 py-1 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-lg">7D</button>
+                        class="px-3 py-1 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-lg">7H</button>
                     <button
-                        class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">30D</button>
+                        class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">30H</button>
                     <button
-                        class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">90D</button>
+                        class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">90H</button>
                 </div>
             </div>
             <div class="relative h-80">
@@ -50,81 +61,86 @@
         <div class="space-y-6">
             <!-- Cars Status -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Cars Status</h3>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Status Mobil</h3>
                 <div class="space-y-4">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Available</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Tersedia</span>
                         </div>
-                        <span class="text-sm font-semibold text-gray-800 dark:text-white">24</span>
+                        <span
+                            class="text-sm font-semibold text-gray-800 dark:text-white">{{ $statusMobil['tersedia'] }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Rented</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Disewa</span>
                         </div>
-                        <span class="text-sm font-semibold text-gray-800 dark:text-white">12</span>
+                        <span
+                            class="text-sm font-semibold text-gray-800 dark:text-white">{{ $statusMobil['disewa'] }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-3">
                             <div class="w-3 h-3 bg-amber-500 rounded-full"></div>
-                            <span class="text-sm text-gray-600 dark:text-gray-400">Maintenance</span>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Perawatan</span>
                         </div>
-                        <span class="text-sm font-semibold text-gray-800 dark:text-white">3</span>
+                        <span
+                            class="text-sm font-semibold text-gray-800 dark:text-white">{{ $statusMobil['perawatan'] }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <span class="text-sm text-gray-600 dark:text-gray-400">Non Aktif</span>
+                        </div>
+                        <span
+                            class="text-sm font-semibold text-gray-800 dark:text-white">{{ $statusMobil['nonaktif'] }}</span>
                     </div>
                 </div>
             </div>
 
             <!-- Top Performing Cars -->
             <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Top Cars</h3>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Mobil Terpopuler</h3>
                 <div class="space-y-3">
-                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                        <div>
-                            <p class="text-sm font-medium text-gray-800 dark:text-white">Toyota Avanza</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">15 bookings</p>
+                    @forelse($mobilTerpopuler as $index => $mobil)
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
+                            <div>
+                                <p class="text-sm font-medium text-gray-800 dark:text-white">{{ $mobil->nama_mobil }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $mobil->transaksi_count }} transaksi
+                                </p>
+                            </div>
+                            <div
+                                class="w-8 h-8 rounded-lg flex items-center justify-center {{ $index === 0 ? 'bg-yellow-100 dark:bg-yellow-900/50' : ($index === 1 ? 'bg-gray-100 dark:bg-gray-600' : 'bg-orange-100 dark:bg-orange-900/50') }}">
+                                @if ($index === 0)
+                                    🏆
+                                @elseif($index === 1)
+                                    🥈
+                                @else
+                                    🥉
+                                @endif
+                            </div>
                         </div>
-                        <div
-                            class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/50 rounded-lg flex items-center justify-center">
-                            🏆
+                    @empty
+                        <div class="text-center py-4">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Belum ada data mobil</p>
                         </div>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                        <div>
-                            <p class="text-sm font-medium text-gray-800 dark:text-white">Honda Jazz</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">12 bookings</p>
-                        </div>
-                        <div class="w-8 h-8 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center">
-                            🥈
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
-                        <div>
-                            <p class="text-sm font-medium text-gray-800 dark:text-white">Mitsubishi Xpander</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">9 bookings</p>
-                        </div>
-                        <div
-                            class="w-8 h-8 bg-orange-100 dark:bg-orange-900/50 rounded-lg flex items-center justify-center">
-                            🥉
-                        </div>
-                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Recent Orders -->
+    <!-- Recent Transactions -->
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Recent Orders</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Latest rental transactions</p>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Transaksi Terbaru</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Transaksi rental terbaru</p>
                 </div>
-                <a href="#"
+                <a href="{{ route('admin.transaksi.index') }}"
                     class="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/50 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/70 transition-colors duration-200">
-                    View All
+                    Lihat Semua
                 </a>
             </div>
         </div>
@@ -135,67 +151,89 @@
                     <tr>
                         <th
                             class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Order</th>
+                            No. Transaksi</th>
                         <th
                             class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Customer</th>
+                            Pelanggan</th>
                         <th
                             class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Car</th>
+                            Mobil</th>
                         <th
                             class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Amount</th>
+                            Total</th>
                         <th
                             class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             Status</th>
                         <th
                             class="px-6 py-4 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            Date</th>
+                            Tanggal</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                    @foreach ($recentOrders as $order)
+                    @forelse ($transaksiTerbaru as $transaksi)
                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $order['id'] }}</div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $transaksi['no_transaksi'] }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <img class="w-8 h-8 rounded-full mr-3"
-                                        src="https://ui-avatars.com/api/?name={{ urlencode($order['customer']) }}&color=7C3AED&background=EDE9FE&size=32"
-                                        alt="{{ $order['customer'] }}">
-                                    <div class="text-sm font-medium text-gray-900 dark:text-white">{{ $order['customer'] }}
+                                        src="https://ui-avatars.com/api/?name={{ urlencode($transaksi['pelanggan']) }}&color=7C3AED&background=EDE9FE&size=32"
+                                        alt="{{ $transaksi['pelanggan'] }}">
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ $transaksi['pelanggan'] }}
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 dark:text-white">{{ $order['car'] }}</div>
+                                <div class="text-sm text-gray-900 dark:text-white">{{ $transaksi['mobil'] }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900 dark:text-white">
-                                    {{ 'Rp ' . number_format($order['total'], 0, ',', '.') }}</div>
+                                    {{ 'Rp ' . number_format($transaksi['total'], 0, ',', '.') }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 @php
                                     $statusClasses = [
-                                        'completed' =>
+                                        'selesai' =>
                                             'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300',
                                         'pending' =>
                                             'bg-amber-100 dark:bg-amber-900/50 text-amber-800 dark:text-amber-300',
-                                        'in_progress' =>
+                                        'berjalan' =>
                                             'bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300',
+                                        'dibayar' =>
+                                            'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300',
+                                        'batal' => 'bg-red-100 dark:bg-red-900/50 text-red-800 dark:text-red-300',
+                                        'telat' =>
+                                            'bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-300',
+                                    ];
+
+                                    $statusLabels = [
+                                        'selesai' => 'Selesai',
+                                        'pending' => 'Pending',
+                                        'berjalan' => 'Berjalan',
+                                        'dibayar' => 'Dibayar',
+                                        'batal' => 'Batal',
+                                        'telat' => 'Telat',
                                     ];
                                 @endphp
                                 <span
-                                    class="inline-flex px-3 py-1 text-xs font-medium rounded-full {{ $statusClasses[$order['status']] }}">
-                                    {{ ucfirst(str_replace('_', ' ', $order['status'])) }}
+                                    class="inline-flex px-3 py-1 text-xs font-medium rounded-full {{ $statusClasses[$transaksi['status']] ?? 'bg-gray-100 dark:bg-gray-900/50 text-gray-800 dark:text-gray-300' }}">
+                                    {{ $statusLabels[$transaksi['status']] ?? ucfirst($transaksi['status']) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                {{ \Carbon\Carbon::parse($order['date'])->format('M d, Y') }}
+                                {{ \Carbon\Carbon::parse($transaksi['tanggal'])->format('d M Y') }}
                             </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+                                Belum ada transaksi
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
@@ -214,7 +252,7 @@
                 data: {
                     labels: chartData.map(item => item.date),
                     datasets: [{
-                        label: 'Revenue',
+                        label: 'Pendapatan',
                         data: chartData.map(item => item.revenue),
                         borderColor: '#6366F1',
                         backgroundColor: 'rgba(99, 102, 241, 0.1)',

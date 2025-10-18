@@ -3,74 +3,99 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\Pelanggan;
+use App\Models\Mobil;
+use App\Models\Transaksi;
+use App\Models\Pembayaran;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
   public function index()
   {
-    // Data dummy hardcode
+    // Statistik real dari database
     $stats = [
-      'total_users' => 1248,
-      'total_orders' => 324,
-      'revenue' => 125750,
-      'pending_orders' => 18,
+      'total_pengguna' => User::count(),
+      'total_pelanggan' => Pelanggan::count(),
+      'total_transaksi' => Transaksi::count(),
+      'pendapatan_bulan_ini' => (int) $this->getPendapatanBulanIni(),
+      'transaksi_pending' => Transaksi::where('status', 'pending')->count(),
+      'transaksi_berjalan' => Transaksi::where('status', 'berjalan')->count(),
     ];
 
-    $recentOrders = [
-      [
-        'id' => 'ORD-001',
-        'customer' => 'John Doe',
-        'car' => 'Toyota Avanza',
-        'total' => 1500000,
-        'status' => 'completed',
-        'date' => '2025-10-08'
-      ],
-      [
-        'id' => 'ORD-002',
-        'customer' => 'Jane Smith',
-        'car' => 'Honda Jazz',
-        'total' => 1200000,
-        'status' => 'pending',
-        'date' => '2025-10-08'
-      ],
-      [
-        'id' => 'ORD-003',
-        'customer' => 'Bob Wilson',
-        'car' => 'Mitsubishi Xpander',
-        'total' => 1800000,
-        'status' => 'completed',
-        'date' => '2025-10-07'
-      ],
-      [
-        'id' => 'ORD-004',
-        'customer' => 'Alice Johnson',
-        'car' => 'Suzuki Ertiga',
-        'total' => 1350000,
-        'status' => 'in_progress',
-        'date' => '2025-10-07'
-      ],
-      [
-        'id' => 'ORD-005',
-        'customer' => 'Mike Brown',
-        'car' => 'Daihatsu Terios',
-        'total' => 1650000,
-        'status' => 'completed',
-        'date' => '2025-10-06'
-      ],
+    // Status mobil
+    $statusMobil = [
+      'tersedia' => Mobil::where('status', 'tersedia')->count(),
+      'disewa' => Mobil::where('status', 'disewa')->count(),
+      'perawatan' => Mobil::where('status', 'perawatan')->count(),
+      'nonaktif' => Mobil::where('status', 'nonaktif')->count(),
     ];
 
-    $chartData = [
-      ['date' => 'Oct 03', 'revenue' => 12500000],
-      ['date' => 'Oct 04', 'revenue' => 15200000],
-      ['date' => 'Oct 05', 'revenue' => 9800000],
-      ['date' => 'Oct 06', 'revenue' => 18300000],
-      ['date' => 'Oct 07', 'revenue' => 14700000],
-      ['date' => 'Oct 08', 'revenue' => 21200000],
-      ['date' => 'Oct 09', 'revenue' => 16400000],
-    ];
+    // Mobil terpopuler berdasarkan jumlah transaksi
+    $mobilTerpopuler = Mobil::withCount(['transaksi' => function ($query) {
+        $query->whereMonth('created_at', Carbon::now()->month)
+              ->whereYear('created_at', Carbon::now()->year);
+    }])
+    ->orderBy('transaksi_count', 'desc')
+    ->take(3)
+    ->get();
 
-    return view('admin.dashboard', compact('stats', 'recentOrders', 'chartData'));
+    // Transaksi terbaru
+    $transaksiTerbaru = Transaksi::with(['pelanggan', 'mobil'])
+      ->orderBy('created_at', 'desc')
+      ->take(5)
+      ->get()
+      ->map(function ($transaksi) {
+        return [
+          'no_transaksi' => $transaksi->no_transaksi,
+          'pelanggan' => $transaksi->pelanggan->nama,
+          'mobil' => $transaksi->mobil->nama_mobil,
+          'total' => $transaksi->total,
+          'status' => $transaksi->status,
+          'tanggal' => $transaksi->created_at->format('Y-m-d'),
+        ];
+      });
+
+    // Data chart pendapatan 7 hari terakhir
+    $chartData = $this->getChartDataPendapatan();
+
+    return view('admin.dashboard', compact(
+      'stats',
+      'statusMobil',
+      'mobilTerpopuler',
+      'transaksiTerbaru',
+      'chartData'
+    ));
+  }
+
+  private function getPendapatanBulanIni()
+  {
+    return Pembayaran::where('status', 'terkonfirmasi')
+      ->whereMonth('tanggal_bayar', Carbon::now()->month)
+      ->whereYear('tanggal_bayar', Carbon::now()->year)
+      ->sum('jumlah');
+  }
+
+  private function getChartDataPendapatan()
+  {
+    $data = [];
+
+    for ($i = 6; $i >= 0; $i--) {
+      $tanggal = Carbon::now()->subDays($i);
+
+      $pendapatan = Pembayaran::where('status', 'terkonfirmasi')
+        ->whereDate('tanggal_bayar', $tanggal->format('Y-m-d'))
+        ->sum('jumlah');
+
+      $data[] = [
+        'date' => $tanggal->format('M d'),
+        'revenue' => $pendapatan
+      ];
+    }
+
+    return $data;
   }
 }
