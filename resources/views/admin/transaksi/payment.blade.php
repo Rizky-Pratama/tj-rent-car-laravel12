@@ -417,7 +417,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-sm text-emerald-700">Total Tagihan</span>
                                 <span class="text-lg font-bold text-emerald-800">Rp
-                                    {{ number_format($transaksi->total_biaya, 0, ',', '.') }}</span>
+                                    {{ number_format($transaksi->total, 0, ',', '.') }}</span>
                             </div>
                         </div>
 
