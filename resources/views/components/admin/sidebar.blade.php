@@ -3,10 +3,11 @@
 
     <!-- Logo -->
     <div class="flex items-center justify-center h-20 px-6 bg-indigo-600 dark:bg-indigo-700">
-        <div class="flex items-center space-x-2">
-            <iconify-icon icon="heroicons:bolt-solid" width="32" height="32"
-                class="w-8 h-8 text-white flex items-center justify-center"></iconify-icon>
-            <h1 class="text-xl font-bold text-white">TJ Rent Car</h1>
+        <div class="flex items-center gap-1">
+            {{-- <iconify-icon icon="heroicons:bolt-solid" width="32" height="32"
+                class="w-8 h-8 text-white flex items-center justify-center"></iconify-icon> --}}
+            <img src="/logo/logo.png" alt="Logo" class="w-24 h-24">
+            <h1 class="text-lg font-bold text-white">TJ Rent Car</h1>
         </div>
     </div>
 
@@ -119,64 +120,6 @@
                             <iconify-icon icon="heroicons:credit-card-20-solid" class="w-5 h-5"></iconify-icon>
                         </div>
                         <span class="ml-3 font-medium">Pembayaran</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Laporan -->
-            <div>
-                <h3 class="px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                    Laporan
-                </h3>
-                <div class="space-y-1">
-                    <!-- Laporan Transaksi -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:chart-bar-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Laporan Transaksi</span>
-                    </a>
-
-                    <!-- Laporan Pelanggan -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:user-group-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Laporan Pelanggan</span>
-                    </a>
-
-                    <!-- Laporan Keuangan -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:banknotes-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Laporan Keuangan</span>
-                    </a>
-
-                    <!-- Laporan Statistik -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:chart-bar-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Laporan Statistik</span>
-                    </a>
-
-                    <!-- Laporan Mobil -->
-                    <a href="#"
-                        class="flex items-center px-2 py-2 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-indigo-50 dark:hover:bg-gray-700 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-200 group">
-                        <div
-                            class="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-200">
-                            <iconify-icon icon="heroicons:document-chart-bar-20-solid" class="w-5 h-5"></iconify-icon>
-                        </div>
-                        <span class="ml-3 font-medium">Laporan Mobil</span>
                     </a>
                 </div>
             </div>
