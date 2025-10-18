@@ -12,11 +12,17 @@ use App\Models\Pembayaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransaksiController extends Controller
 {
     public function index(Request $request)
     {
+        // Check if export is requested
+        if ($request->get('export') === 'pdf') {
+            return $this->exportPDF($request);
+        }
+
         // Ambil semua parameter filter
         $filters = $request->only([
             'period', 'date_from', 'date_to', 'status', 'payment_status',
@@ -454,5 +460,68 @@ class TransaksiController extends Controller
                                ->findOrFail($id);
 
         return view('admin.transaksi.payment', compact('transaksi'));
+    }
+
+    public function exportPDF(Request $request)
+    {
+        try {
+            $transaksi = $this->getFilteredTransaksi($request);
+            $filters = $request->only([
+                'period', 'date_from', 'date_to', 'status', 'payment_status',
+                'mobil_id', 'sopir_id', 'jenis_sewa', 'min_total', 'max_total', 'search'
+            ]);
+            $statistik = $this->getStatistik($request);
+
+            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.transaksi.pdf-export', [
+                'transaksi' => $transaksi,
+                'filters' => $filters,
+                'statistik' => $statistik,
+                'generated_at' => now()
+            ]);
+
+            $pdf->setPaper('a4', 'landscape');
+
+            $filename = 'laporan-transaksi-' . now()->format('Y-m-d-H-i-s') . '.pdf';
+
+            return $pdf->download($filename);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengunduh laporan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function getFilteredTransaksi(Request $request)
+    {
+        $filters = $request->only([
+            'period', 'date_from', 'date_to', 'status', 'payment_status',
+            'mobil_id', 'sopir_id', 'jenis_sewa', 'min_total', 'max_total', 'search'
+        ]);
+
+        return Transaksi::with(['pelanggan', 'mobil', 'hargaSewa.jenisSewa', 'sopir'])
+                        ->filter($filters)
+                        ->orderBy('created_at', 'desc')
+                        ->get();
+    }
+
+    private function getStatistik(Request $request)
+    {
+        $filters = $request->only([
+            'period', 'date_from', 'date_to', 'status', 'payment_status',
+            'mobil_id', 'sopir_id', 'jenis_sewa', 'min_total', 'max_total', 'search'
+        ]);
+
+        return [
+            'total' => Transaksi::filter($filters)->count(),
+            'pending' => Transaksi::filter($filters)->where('status', 'pending')->count(),
+            'dibayar' => Transaksi::filter($filters)->where('status', 'dibayar')->count(),
+            'berjalan' => Transaksi::filter($filters)->where('status', 'berjalan')->count(),
+            'telat' => Transaksi::filter($filters)->where('status', 'telat')->count(),
+            'selesai' => Transaksi::filter($filters)->where('status', 'selesai')->count(),
+            'dibatalkan' => Transaksi::filter($filters)->where('status', 'dibatalkan')->count(),
+            'total_pendapatan' => Transaksi::filter($filters)->where('status', 'selesai')->sum('total'),
+        ];
     }
 }
