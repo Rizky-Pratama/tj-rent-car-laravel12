@@ -19,6 +19,15 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" x-data="transactionForm()">
             <!-- Left: Form Sections -->
             <div class="lg:col-span-2 space-y-6">
+                @if ($errors->any())
+                    <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 <form action="{{ route('admin.transaksi.store') }}" method="POST" class="space-y-6">
                     @csrf
 
@@ -349,12 +358,15 @@
                         </div>
 
                         <!-- Driver Selection -->
-                        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6" x-show="requiresDriver"
+                            x-transition>
                             <label for="sopir_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                Sopir (Opsional)
+                                Sopir <span class="text-red-500" x-show="requiresDriver">*</span>
+                                <span class="text-gray-500" x-show="!requiresDriver">(Opsional)</span>
                             </label>
-                            <div class="space-y-3">
-                                <label class="relative cursor-pointer">
+                            <div class="flex flex-col gap-4">
+                                <!-- No Driver Option - only show if driver not required -->
+                                <label class="relative cursor-pointer" x-show="!requiresDriver">
                                     <input type="radio" name="sopir_id" value="" x-model="selectedDriver"
                                         @change="updateCalculation()" class="sr-only peer">
                                     <div
@@ -385,7 +397,8 @@
                                         <input type="radio" name="sopir_id" value="{{ $item->id }}"
                                             x-model="selectedDriver" @change="updateCalculation()"
                                             data-tarif="{{ $item->tarif_per_hari ?? 0 }}"
-                                            {{ old('sopir_id') == $item->id ? 'checked' : '' }} class="sr-only peer">
+                                            {{ old('sopir_id') == $item->id ? 'checked' : '' }} :required="requiresDriver"
+                                            class="sr-only peer">
                                         <div
                                             class="p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 transition-all">
                                             <div class="flex items-center justify-between">
@@ -403,21 +416,8 @@
                                                             <iconify-icon icon="heroicons:phone-20-solid"
                                                                 class="w-4 h-4"></iconify-icon>
                                                             <span>{{ $item->telepon }}</span>
-                                                            @if ($item->rating)
-                                                                <div class="flex items-center space-x-1">
-                                                                    <iconify-icon icon="heroicons:star-20-solid"
-                                                                        class="w-4 h-4 text-yellow-500"></iconify-icon>
-                                                                    <span>{{ number_format($item->rating, 1) }}</span>
-                                                                </div>
-                                                            @endif
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div class="text-right">
-                                                    <p class="text-lg font-bold text-indigo-600 dark:text-indigo-400">
-                                                        Rp {{ number_format($item->tarif_per_hari ?? 0, 0, ',', '.') }}
-                                                    </p>
-                                                    <p class="text-sm text-gray-500 dark:text-gray-400">per hari</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -427,6 +427,30 @@
                             @error('sopir_id')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                        </div>
+
+                        <!-- Driver Required Notice -->
+                        <div x-show="!requiresDriver" x-transition
+                            class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <div class="flex items-center space-x-2">
+                                <iconify-icon icon="heroicons:information-circle-20-solid"
+                                    class="w-5 h-5 text-blue-600 dark:text-blue-400"></iconify-icon>
+                                <p class="text-sm text-blue-700 dark:text-blue-300">
+                                    Paket ini tidak memerlukan sopir. Pilih paket dengan "Driver" jika Anda membutuhkan
+                                    sopir.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Driver Validation Message -->
+                        <div x-show="requiresDriver && getDriverValidationMessage()" x-transition
+                            class="mt-6 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                            <div class="flex items-center space-x-2">
+                                <iconify-icon icon="heroicons:exclamation-triangle-20-solid"
+                                    class="w-5 h-5 text-orange-600 dark:text-orange-400"></iconify-icon>
+                                <p class="text-sm text-orange-700 dark:text-orange-300"
+                                    x-text="getDriverValidationMessage()"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -505,22 +529,6 @@
                                         x-text="formatCurrency(carRentalCost)"></p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400"
                                         x-text="`${formatCurrency(dailyCarRate)} × ${duration} hari`"></p>
-                                </div>
-                            </div>
-
-                            <!-- Driver Cost -->
-                            <div x-show="driverCost > 0"
-                                class="flex items-center justify-between py-2 border-b border-indigo-200 dark:border-indigo-700">
-                                <div class="flex items-center space-x-2">
-                                    <iconify-icon icon="heroicons:user-20-solid"
-                                        class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></iconify-icon>
-                                    <span class="text-sm text-gray-700 dark:text-gray-300">Sopir</span>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-medium text-gray-900 dark:text-white"
-                                        x-text="formatCurrency(driverCost)"></p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400"
-                                        x-text="`${formatCurrency(dailyDriverRate)} × ${duration} hari`"></p>
                                 </div>
                             </div>
 
@@ -614,7 +622,6 @@
                                     <span class="font-medium text-gray-700 dark:text-gray-300">Sopir</span>
                                 </div>
                                 <p class="text-gray-900 dark:text-white ml-6" x-text="getDriverInfo().name"></p>
-                                <p class="text-gray-600 dark:text-gray-400 ml-6" x-text="getDriverInfo().rate"></p>
                             </div>
                         </div>
 
@@ -680,6 +687,9 @@
                     driverCost: 0,
                     totalCost: 0,
 
+                    // Driver requirement check
+                    requiresDriver: false,
+
                     // Data from Backend
                     pelangganData: @json($pelanggan->keyBy('id')),
                     mobilData: @json($mobil->keyBy('id')),
@@ -698,6 +708,8 @@
                         if (this.selectedPricing && this.duration > 0) {
                             this.updateCalculation();
                         }
+                        // Check initial driver requirement
+                        this.checkDriverRequirement();
                     },
 
                     updateCustomerInfo(customerId) {
@@ -730,6 +742,12 @@
 
                     loadPricingOptions(carId) {
                         this.pricingOptions = [];
+
+                        // Reset pricing and driver selection when car changes
+                        this.selectedPricing = '';
+                        this.selectedDriver = '';
+                        this.requiresDriver = false;
+
                         if (carId && this.hargaSewaData[carId]) {
                             this.pricingOptions = this.hargaSewaData[carId] || [];
                         }
@@ -741,6 +759,9 @@
                         this.carRentalCost = 0;
                         this.driverCost = 0;
                         this.totalCost = 0;
+
+                        // Check driver requirement first
+                        this.checkDriverRequirement();
 
                         // Calculate car rental cost
                         if (this.selectedPricing && this.duration > 0) {
@@ -761,6 +782,30 @@
                         }
 
                         this.totalCost = this.carRentalCost + this.driverCost;
+                    },
+
+                    checkDriverRequirement() {
+                        const previousRequirement = this.requiresDriver;
+                        this.requiresDriver = false;
+
+                        if (this.selectedPricing) {
+                            const pricing = this.pricingOptions.find(p => p.id == this.selectedPricing);
+                            if (pricing && pricing.jenis_sewa && pricing.jenis_sewa.slug) {
+                                // Check if slug contains 'driver'
+                                this.requiresDriver = pricing.jenis_sewa.slug.toLowerCase().includes(
+                                    'driver');
+                            }
+                        }
+
+                        // Handle driver selection based on requirement changes
+                        if (!this.requiresDriver && previousRequirement) {
+                            // Driver is no longer required but was before - clear selection
+                            this.selectedDriver = '';
+                            console.log('Driver cleared - no longer required for this package');
+                        } else if (this.requiresDriver && !this.selectedDriver) {
+                            // Driver is required but not selected - keep empty for user to choose
+                            console.log('Driver required - user needs to select one');
+                        }
                     },
 
                     setDuration(days) {
@@ -818,11 +863,25 @@
                     },
 
                     isFormValid() {
-                        return this.selectedCustomer &&
+                        const baseValid = this.selectedCustomer &&
                             this.selectedCar &&
                             this.selectedPricing &&
                             this.rentalDate &&
                             this.duration > 0;
+
+                        // If driver is required, check if driver is selected
+                        if (this.requiresDriver) {
+                            return baseValid && this.selectedDriver && this.selectedDriver !== '';
+                        }
+
+                        return baseValid;
+                    },
+
+                    getDriverValidationMessage() {
+                        if (this.requiresDriver && (!this.selectedDriver || this.selectedDriver === '')) {
+                            return 'Pilih sopir untuk melanjutkan - diperlukan untuk paket ini';
+                        }
+                        return '';
                     },
 
                     validateAvailability() {

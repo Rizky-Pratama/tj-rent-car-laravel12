@@ -310,14 +310,16 @@
                         </div>
 
                         <!-- Driver Selection -->
-                        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+                        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6" x-show="requiresDriver"
+                            x-transition>
                             <label for="sopir_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                                 <iconify-icon icon="heroicons:user-20-solid" class="w-4 h-4 inline mr-1"></iconify-icon>
-                                Pilihan Sopir (Opsional)
+                                Pilihan Sopir <span class="text-red-500" x-show="requiresDriver">*</span>
+                                <span class="text-gray-500" x-show="!requiresDriver">(Opsional)</span>
                             </label>
                             <div class="space-y-3">
-                                <!-- Self Drive Option -->
-                                <label
+                                <!-- Self Drive Option - only show if driver not required -->
+                                <label x-show="!requiresDriver"
                                     class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
                                     <input type="radio" name="sopir_id" value="" x-model="selectedDriver"
                                         @change="updateCalculation()"
@@ -341,6 +343,7 @@
                                         <input type="radio" name="sopir_id" value="{{ $item->id }}"
                                             x-model="selectedDriver" @change="updateCalculation()"
                                             {{ old('sopir_id', $transaksi->sopir_id) == $item->id ? 'checked' : '' }}
+                                            :required="requiresDriver"
                                             class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 dark:focus:ring-indigo-400">
                                         <div class="ml-3 flex-1">
                                             <div class="flex items-center justify-between">
@@ -370,6 +373,30 @@
                             @error('sopir_id')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                        </div>
+
+                        <!-- Driver Required Notice -->
+                        <div x-show="!requiresDriver" x-transition
+                            class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <div class="flex items-center space-x-2">
+                                <iconify-icon icon="heroicons:information-circle-20-solid"
+                                    class="w-5 h-5 text-blue-600 dark:text-blue-400"></iconify-icon>
+                                <p class="text-sm text-blue-700 dark:text-blue-300">
+                                    Paket ini tidak memerlukan sopir. Pilih paket dengan "Driver" jika Anda membutuhkan
+                                    sopir.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Driver Validation Message -->
+                        <div x-show="requiresDriver && getDriverValidationMessage()" x-transition
+                            class="mt-6 p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                            <div class="flex items-center space-x-2">
+                                <iconify-icon icon="heroicons:exclamation-triangle-20-solid"
+                                    class="w-5 h-5 text-orange-600 dark:text-orange-400"></iconify-icon>
+                                <p class="text-sm text-orange-700 dark:text-orange-300"
+                                    x-text="getDriverValidationMessage()"></p>
+                            </div>
                         </div>
                     </div>
 
@@ -629,6 +656,9 @@
                     driverCost: 0,
                     totalCost: 0,
 
+                    // Driver requirement check
+                    requiresDriver: false,
+
                     // Data from Backend
                     pelangganData: @json($pelanggan->keyBy('id')),
                     mobilData: @json($mobil->keyBy('id')),
@@ -647,6 +677,8 @@
                         if (this.selectedPricing && this.duration > 0) {
                             this.updateCalculation();
                         }
+                        // Check initial driver requirement
+                        this.checkDriverRequirement();
                     },
 
                     updateCustomerInfo(customerId) {
@@ -680,9 +712,17 @@
 
                     loadPricingOptions(carId) {
                         this.pricingOptions = [];
+
+                        // Reset pricing and driver selection when car changes
+                        this.selectedPricing = '';
+                        this.selectedDriver = '';
+                        this.requiresDriver = false;
+
                         if (carId && this.hargaSewaData[carId]) {
                             this.pricingOptions = this.hargaSewaData[carId] || [];
                         }
+
+                        console.log('Car changed - pricing and driver selection reset');
                     },
 
                     updateCalculation() {
@@ -691,6 +731,9 @@
                         this.carRentalCost = 0;
                         this.driverCost = 0;
                         this.totalCost = 0;
+
+                        // Check driver requirement first
+                        this.checkDriverRequirement();
 
                         // Calculate car rental cost
                         if (this.selectedPricing && this.duration > 0) {
@@ -711,6 +754,30 @@
                         }
 
                         this.totalCost = this.carRentalCost + this.driverCost;
+                    },
+
+                    checkDriverRequirement() {
+                        const previousRequirement = this.requiresDriver;
+                        this.requiresDriver = false;
+
+                        if (this.selectedPricing) {
+                            const pricing = this.pricingOptions.find(p => p.id == this.selectedPricing);
+                            if (pricing && pricing.jenis_sewa && pricing.jenis_sewa.slug) {
+                                // Check if slug contains 'driver'
+                                this.requiresDriver = pricing.jenis_sewa.slug.toLowerCase().includes(
+                                    'driver');
+                            }
+                        }
+
+                        // Handle driver selection based on requirement changes
+                        if (!this.requiresDriver && previousRequirement) {
+                            // Driver is no longer required but was before - clear selection
+                            this.selectedDriver = '';
+                            console.log('Driver cleared - no longer required for this package');
+                        } else if (this.requiresDriver && !this.selectedDriver) {
+                            // Driver is required but not selected - keep empty for user to choose
+                            console.log('Driver required - user needs to select one');
+                        }
                     },
 
                     setDuration(days) {
@@ -766,11 +833,25 @@
                     },
 
                     isFormValid() {
-                        return this.selectedCustomer &&
+                        const baseValid = this.selectedCustomer &&
                             this.selectedCar &&
                             this.selectedPricing &&
                             this.rentalDate &&
                             this.duration > 0;
+
+                        // If driver is required, check if driver is selected
+                        if (this.requiresDriver) {
+                            return baseValid && this.selectedDriver && this.selectedDriver !== '';
+                        }
+
+                        return baseValid;
+                    },
+
+                    getDriverValidationMessage() {
+                        if (this.requiresDriver && (!this.selectedDriver || this.selectedDriver === '')) {
+                            return 'Pilih sopir untuk melanjutkan - diperlukan untuk paket ini';
+                        }
+                        return '';
                     }
                 }));
             });
