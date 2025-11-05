@@ -411,9 +411,75 @@
                         Ringkasan Biaya
                     </h3>
                     <div class="space-y-2 text-xs">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600 dark:text-gray-400">Total Tagihan:</span>
-                            <span class="font-medium text-gray-900 dark:text-white">Rp
+                        <!-- Detail Biaya Sewa -->
+                        <div class="pb-2 border-b border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-600 dark:text-gray-400">Jenis Sewa:</span>
+                                <span
+                                    class="font-medium text-gray-900 dark:text-white">{{ $transaksi->hargaSewa->jenisSewa->nama_jenis }}</span>
+                            </div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-600 dark:text-gray-400">Harga/Hari:</span>
+                                <span class="font-medium text-gray-900 dark:text-white">Rp
+                                    {{ number_format($transaksi->hargaSewa->harga_per_hari, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex justify-between mb-1">
+                                <span class="text-gray-600 dark:text-gray-400">Durasi:</span>
+                                <span class="font-medium text-gray-900 dark:text-white">{{ $transaksi->durasi_hari }}
+                                    hari</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-700 dark:text-gray-300 font-medium">Subtotal:</span>
+                                <span class="font-semibold text-gray-900 dark:text-white">Rp
+                                    {{ number_format($transaksi->subtotal, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Biaya Tambahan -->
+                        @if ($transaksi->biaya_tambahan > 0)
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Biaya Tambahan:</span>
+                                <span class="font-medium text-orange-600 dark:text-orange-400">+Rp
+                                    {{ number_format($transaksi->biaya_tambahan, 0, ',', '.') }}</span>
+                            </div>
+                        @endif
+
+                        <!-- Denda Otomatis -->
+                        @if ($transaksi->denda > 0)
+                            <div class="bg-red-50 dark:bg-red-900/10 rounded-lg p-2 mb-2">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-red-700 dark:text-red-400 font-medium text-xs">Denda
+                                        Keterlambatan:</span>
+                                    <span class="font-semibold text-red-700 dark:text-red-400">+Rp
+                                        {{ number_format($transaksi->denda, 0, ',', '.') }}</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-red-600 dark:text-red-500">Terlambat:</span>
+                                    <span class="text-red-600 dark:text-red-500 font-medium">{{ $transaksi->hari_telat }}
+                                        hari</span>
+                                </div>
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-red-600 dark:text-red-500">Denda/Hari:</span>
+                                    <span class="text-red-600 dark:text-red-500 font-medium">Rp
+                                        {{ number_format($transaksi->denda_per_hari, 0, ',', '.') }}</span>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Denda Manual -->
+                        @if ($transaksi->denda_manual > 0)
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-400">Denda Manual:</span>
+                                <span class="font-medium text-red-600 dark:text-red-400">+Rp
+                                    {{ number_format($transaksi->denda_manual, 0, ',', '.') }}</span>
+                            </div>
+                        @endif
+
+                        <!-- Total & Status Pembayaran -->
+                        <hr class="border-gray-200 dark:border-gray-700">
+                        <div class="flex justify-between pt-1">
+                            <span class="text-gray-700 dark:text-gray-300 font-semibold">Total Tagihan:</span>
+                            <span class="font-bold text-gray-900 dark:text-white text-sm">Rp
                                 {{ number_format($transaksi->total, 0, ',', '.') }}</span>
                         </div>
                         <div class="flex justify-between text-green-600 dark:text-green-400">
@@ -423,9 +489,42 @@
                         </div>
                         <hr class="border-gray-200 dark:border-gray-700">
                         <div
-                            class="flex justify-between {{ $transaksi->sisa_pembayaran > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }} font-semibold">
+                            class="flex justify-between {{ $transaksi->sisa_pembayaran > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }} font-semibold pt-1">
                             <span>{{ $transaksi->sisa_pembayaran > 0 ? 'Sisa:' : 'Status:' }}</span>
-                            <span>{{ $transaksi->sisa_pembayaran > 0 ? 'Rp ' . number_format($transaksi->sisa_pembayaran, 0, ',', '.') : 'LUNAS' }}</span>
+                            <span
+                                class="text-sm">{{ $transaksi->sisa_pembayaran > 0 ? 'Rp ' . number_format($transaksi->sisa_pembayaran, 0, ',', '.') : 'LUNAS' }}</span>
+                        </div>
+
+                        <!-- Status Pembayaran Badge -->
+                        <div class="pt-2">
+                            @if ($transaksi->status_pembayaran === 'lunas')
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-300 w-full justify-center">
+                                    <iconify-icon icon="heroicons:check-circle-20-solid"
+                                        class="w-3 h-3 mr-1"></iconify-icon>
+                                    Lunas
+                                </span>
+                            @elseif ($transaksi->status_pembayaran === 'sebagian')
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-300 w-full justify-center">
+                                    <iconify-icon icon="heroicons:clock-20-solid" class="w-3 h-3 mr-1"></iconify-icon>
+                                    Sebagian
+                                </span>
+                            @elseif ($transaksi->status_pembayaran === 'refund')
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300 w-full justify-center">
+                                    <iconify-icon icon="heroicons:arrow-uturn-left-20-solid"
+                                        class="w-3 h-3 mr-1"></iconify-icon>
+                                    Refund
+                                </span>
+                            @else
+                                <span
+                                    class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300 w-full justify-center">
+                                    <iconify-icon icon="heroicons:exclamation-circle-20-solid"
+                                        class="w-3 h-3 mr-1"></iconify-icon>
+                                    Belum Bayar
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>

@@ -106,6 +106,66 @@ class Transaksi extends Model
         return 'Rp ' . number_format($this->total, 0, ',', '.');
     }
 
+    /**
+     * Cek apakah transaksi telat dan hitung berapa hari keterlambatan
+     * Return: ['is_telat' => bool, 'hari_telat' => int, 'denda_per_hari' => int]
+     */
+    public function getSelisihTelatAttribute()
+    {
+        // Jika transaksi sudah selesai atau dibatalkan, gunakan tanggal_dikembalikan
+        // Jika masih berjalan, gunakan tanggal sekarang
+        $tanggalPengecekan = $this->tanggal_dikembalikan
+            ? Carbon::parse($this->tanggal_dikembalikan)
+            : Carbon::now();
+
+        $tanggalKembali = Carbon::parse($this->tanggal_kembali);
+
+        // Hitung selisih hari (positif = telat, negatif/0 = tidak telat)
+        $hariTelat = $tanggalPengecekan->diffInDays($tanggalKembali, false);
+
+        // Jika negatif berarti telat (tanggal pengecekan > tanggal kembali)
+        $isTelat = $hariTelat < 0;
+        $jumlahHariTelat = $isTelat ? abs(floor($hariTelat)) : 0;
+
+        // Hitung denda per hari jika ada denda
+        $dendaPerHari = 0;
+        if ($jumlahHariTelat > 0 && $this->denda > 0) {
+            $dendaPerHari = ceil($this->denda / $jumlahHariTelat);
+        }
+
+        return [
+            'is_telat' => $isTelat,
+            'hari_telat' => $jumlahHariTelat,
+            'denda_per_hari' => $this->hargaSewa->jenissewa->tarif_denda_per_hari,
+            'tanggal_seharusnya_kembali' => $tanggalKembali->format('d/m/Y H:i'),
+            'tanggal_pengecekan' => $tanggalPengecekan->format('d/m/Y H:i'),
+        ];
+    }
+
+    /**
+     * Shortcut untuk cek apakah telat
+     */
+    public function getIsTelatAttribute()
+    {
+        return $this->selisih_telat['is_telat'];
+    }
+
+    /**
+     * Shortcut untuk get jumlah hari telat
+     */
+    public function getHariTelatAttribute()
+    {
+        return $this->selisih_telat['hari_telat'];
+    }
+
+    /**
+     * Shortcut untuk get denda per hari
+     */
+    public function getDendaPerHariAttribute()
+    {
+        return $this->selisih_telat['denda_per_hari'];
+    }
+
     // Scopes
     public function scopePending($query)
     {
