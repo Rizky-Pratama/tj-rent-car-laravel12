@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\JadwalController;
 use App\Http\Controllers\Admin\TransaksiController;
 use App\Http\Controllers\Admin\PembayaranController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Api\MobilController as ApiMobilController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -77,3 +78,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 Route::get('/dashboard', function () {
     return redirect()->route('admin.dashboard');
 });
+
+// API Routes
+Route::prefix('api/v1')->name('api.')->group(function () {
+    // Mobil endpoints
+    Route::get('/mobil', [ApiMobilController::class, 'index'])->name('mobil.index');
+});
+
