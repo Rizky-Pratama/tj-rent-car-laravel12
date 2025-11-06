@@ -72,7 +72,6 @@
                             </div>
 
                             <!-- Customer Info Preview -->
-                            <!-- Customer Info Preview -->
                             <div x-show="selectedCustomer" x-transition
                                 class="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">

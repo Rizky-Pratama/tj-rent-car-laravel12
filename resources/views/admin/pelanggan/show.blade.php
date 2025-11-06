@@ -46,7 +46,7 @@
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">{{ $pelanggan->nama }}</h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">{{ $pelanggan->email }}</p>
                         <div class="mt-2">
-                            @if ($pelanggan->jenis_kelamin === 'L')
+                            @if ($pelanggan->jenis_kelamin === 'laki-laki')
                                 <span
                                     class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                                     <iconify-icon icon="heroicons:user-20-solid" class="w-4 h-4 mr-1"></iconify-icon>
@@ -196,7 +196,7 @@
                                     Kelamin</label>
                                 <div class="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
                                     <span class="text-sm text-gray-900 dark:text-white">
-                                        {{ $pelanggan->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}
+                                        {{ $pelanggan->jenis_kelamin === 'laki-laki' ? 'Laki-laki' : 'Perempuan' }}
                                     </span>
                                 </div>
                             </div>

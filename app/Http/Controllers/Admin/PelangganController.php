@@ -32,11 +32,9 @@ class PelangganController extends Controller
         // Calculate stats
         $stats = [
             'total' => Pelanggan::count(),
-            'pria' => Pelanggan::where('jenis_kelamin', 'L')->count(),
-            'wanita' => Pelanggan::where('jenis_kelamin', 'P')->count(),
-            'aktif' => Pelanggan::whereHas('transaksi', function($q) {
-                $q->whereIn('status', ['berlangsung', 'selesai']);
-            })->count(),
+            'pria' => Pelanggan::where('jenis_kelamin', 'laki-laki')->count(),
+            'wanita' => Pelanggan::where('jenis_kelamin', 'perempuan')->count(),
+            'aktif' => Pelanggan::where('status', 'aktif')->count(),
         ];
 
         $pelanggan = $query->orderBy('created_at', 'desc')->paginate(10);
@@ -60,12 +58,14 @@ class PelangganController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:pelanggan',
-            'telepon' => 'required|string|max:20',
+            'telepon' => 'required|string|max:15',
             'alamat' => 'required|string',
             'no_ktp' => 'required|string|max:20|unique:pelanggan',
-            'no_sim' => 'required|string|max:20',
-            'tanggal_lahir' => 'required|date',
-            'jenis_kelamin' => 'required|in:L,P',
+            'no_sim' => 'nullable|string|max:20',
+            'tanggal_lahir' => 'nullable|date',
+            'jenis_kelamin' => 'nullable|in:laki-laki,perempuan',
+            'pekerjaan' => 'nullable|string|max:255',
+            'catatan' => 'nullable|string',
         ]);
 
         Pelanggan::create($validated);
@@ -84,12 +84,14 @@ class PelangganController extends Controller
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('pelanggan')->ignore($pelanggan->id)],
-            'telepon' => 'required|string|max:20',
+            'telepon' => 'required|string|max:15',
             'alamat' => 'required|string',
             'no_ktp' => ['required', 'string', 'max:20', Rule::unique('pelanggan')->ignore($pelanggan->id)],
-            'no_sim' => 'required|string|max:20',
-            'tanggal_lahir' => 'required|date',
-            'jenis_kelamin' => 'required|in:L,P',
+            'no_sim' => 'nullable|string|max:20',
+            'tanggal_lahir' => 'nullable|date',
+            'jenis_kelamin' => 'nullable|in:laki-laki,perempuan',
+            'pekerjaan' => 'nullable|string|max:255',
+            'catatan' => 'nullable|string',
         ]);
 
         $pelanggan->update($validated);

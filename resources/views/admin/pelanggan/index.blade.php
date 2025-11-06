@@ -94,8 +94,10 @@
                 <select name="jenis_kelamin"
                     class="px-3 py-2 text-sm bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500">
                     <option value="">Semua Jenis Kelamin</option>
-                    <option value="L" {{ request('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-laki</option>
-                    <option value="P" {{ request('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
+                    <option value="laki-laki" {{ request('jenis_kelamin') == 'laki-laki' ? 'selected' : '' }}>Laki-laki
+                    </option>
+                    <option value="perempuan" {{ request('jenis_kelamin') == 'perempuan' ? 'selected' : '' }}>Perempuan
+                    </option>
                 </select>
 
                 <button type="submit"
@@ -195,14 +197,15 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white">KTP: {{ $customer->no_ktp }}</div>
-                                <div class="text-sm text-gray-500 dark:text-gray-400">SIM: {{ $customer->no_sim }}</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">SIM: {{ $customer->no_sim ?? '-' }}
+                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 dark:text-white">
-                                    {{ $customer->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}
+                                    {{ $customer->jenis_kelamin ? ucfirst($customer->jenis_kelamin) : '-' }}
                                 </div>
                                 <div class="text-sm text-gray-500 dark:text-gray-400">
-                                    {{ \Carbon\Carbon::parse($customer->tanggal_lahir)->format('d M Y') }}
+                                    {{ $customer->tanggal_lahir ? \Carbon\Carbon::parse($customer->tanggal_lahir)->format('d M Y') : '-' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">

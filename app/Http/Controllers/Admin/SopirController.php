@@ -54,13 +54,10 @@ class SopirController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'telepon' => 'required|string|max:20',
-            'alamat' => 'required|string',
-            'no_sim' => 'required|string|max:20',
-            'tanggal_lahir' => 'required|date',
-            'pengalaman_tahun' => 'required|integer|min:0',
-            'tarif_per_hari' => 'required|integer|min:0',
-            'status' => 'required|in:tersedia,tidak_tersedia',
+            'telepon' => 'required|string|max:30',
+            'no_sim' => 'required|string|max:50|unique:sopir',
+            'status' => 'required|in:tersedia,ditugaskan,libur',
+            'catatan' => 'nullable|string',
         ]);
 
         Sopir::create($validated);
@@ -78,13 +75,10 @@ class SopirController extends Controller
     {
         $validated = $request->validate([
             'nama' => 'required|string|max:255',
-            'telepon' => 'required|string|max:20',
-            'alamat' => 'required|string',
-            'no_sim' => 'required|string|max:20',
-            'tanggal_lahir' => 'required|date',
-            'pengalaman_tahun' => 'required|integer|min:0',
-            'tarif_per_hari' => 'required|integer|min:0',
-            'status' => 'required|in:tersedia,tidak_tersedia',
+            'telepon' => 'required|string|max:30',
+            'no_sim' => ['required', 'string', 'max:50', Rule::unique('sopir')->ignore($sopir->id)],
+            'status' => 'required|in:tersedia,ditugaskan,libur',
+            'catatan' => 'nullable|string',
         ]);
 
         $sopir->update($validated);

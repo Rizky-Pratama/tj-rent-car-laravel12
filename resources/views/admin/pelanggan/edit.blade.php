@@ -129,12 +129,12 @@
                             <div class="mb-4">
                                 <label for="no_sim"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Nomor SIM <span class="text-red-500">*</span>
+                                    Nomor SIM
                                 </label>
                                 <input type="text" name="no_sim" id="no_sim"
                                     value="{{ old('no_sim', $pelanggan->no_sim) }}"
                                     class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 @error('no_sim') border-red-500 @enderror"
-                                    placeholder="Masukkan nomor SIM" required>
+                                    placeholder="Masukkan nomor SIM (opsional)">
                                 @error('no_sim')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -144,13 +144,12 @@
                             <div class="mb-4">
                                 <label for="tanggal_lahir"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Tanggal Lahir <span class="text-red-500">*</span>
+                                    Tanggal Lahir
                                 </label>
                                 <input type="date" name="tanggal_lahir" id="tanggal_lahir"
                                     value="{{ old('tanggal_lahir', $pelanggan->tanggal_lahir?->format('Y-m-d')) }}"
                                     max="{{ date('Y-m-d', strtotime('-17 years')) }}"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 @error('tanggal_lahir') border-red-500 @enderror"
-                                    required>
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 @error('tanggal_lahir') border-red-500 @enderror">
                                 @error('tanggal_lahir')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -161,20 +160,48 @@
                             <div class="mb-4">
                                 <label for="jenis_kelamin"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Jenis Kelamin <span class="text-red-500">*</span>
+                                    Jenis Kelamin
                                 </label>
                                 <select name="jenis_kelamin" id="jenis_kelamin"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 @error('jenis_kelamin') border-red-500 @enderror"
-                                    required>
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 @error('jenis_kelamin') border-red-500 @enderror">
                                     <option value="">Pilih Jenis Kelamin</option>
-                                    <option value="L"
-                                        {{ old('jenis_kelamin', $pelanggan->jenis_kelamin) === 'L' ? 'selected' : '' }}>
+                                    <option value="laki-laki"
+                                        {{ old('jenis_kelamin', $pelanggan->jenis_kelamin) === 'laki-laki' ? 'selected' : '' }}>
                                         Laki-laki</option>
-                                    <option value="P"
-                                        {{ old('jenis_kelamin', $pelanggan->jenis_kelamin) === 'P' ? 'selected' : '' }}>
+                                    <option value="perempuan"
+                                        {{ old('jenis_kelamin', $pelanggan->jenis_kelamin) === 'perempuan' ? 'selected' : '' }}>
                                         Perempuan</option>
                                 </select>
                                 @error('jenis_kelamin')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Pekerjaan -->
+                            <div class="mb-4">
+                                <label for="pekerjaan"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Pekerjaan
+                                </label>
+                                <input type="text" name="pekerjaan" id="pekerjaan"
+                                    value="{{ old('pekerjaan', $pelanggan->pekerjaan) }}"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 @error('pekerjaan') border-red-500 @enderror"
+                                    placeholder="Masukkan pekerjaan (opsional)">
+                                @error('pekerjaan')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <!-- Catatan -->
+                            <div class="mb-4">
+                                <label for="catatan"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Catatan
+                                </label>
+                                <textarea name="catatan" id="catatan" rows="3"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors duration-200 @error('catatan') border-red-500 @enderror"
+                                    placeholder="Catatan tambahan (opsional)">{{ old('catatan', $pelanggan->catatan) }}</textarea>
+                                @error('catatan')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
