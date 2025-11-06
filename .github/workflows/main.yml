@@ -1,51 +1,183 @@
-name: Deploy via SSH
+name: Deploy to Production
+
 on:
   push:
     branches: [master]
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: "Skip tests"
+        required: false
+        default: "false"
+
+env:
+  PHP_VERSION: "8.2"
+  NODE_VERSION: "18"
 
 jobs:
-  deploy:
+  # Job 1: Build & Test
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
 
-      - name: Install Node dependencies
+      - name: 📦 Install Node dependencies
         run: npm ci
 
-      - name: Build Tailwind CSS
+      - name: 🎨 Build Tailwind CSS
         run: npm run build
 
-      - name: Setup PHP
+      - name: 🐘 Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, gd, json, zip
+          coverage: none
 
-      - name: Install PHP dependencies
-        run: composer install --no-dev --optimize-autoloader
+      - name: 📦 Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-      - name: Deploy files to server
-        uses: appleboy/scp-action@master
+      - name: 🧪 Run Tests
+        if: ${{ github.event.inputs.skip_tests != 'true' }}
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan test --parallel
+
+      - name: 📤 Upload built assets
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            public/build
+            vendor
+          retention-days: 1
+
+  # Job 2: Deploy
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📥 Download built assets
+        uses: actions/download-artifact@v3
+        with:
+          name: build-artifacts
+
+      - name: 🚀 Deploy files to server
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
-          source: "."
-          target: "~/tj-rent-car"
-          rm: false
-          strip_components: 0
+          source: |
+            app,
+            bootstrap,
+            config,
+            database,
+            public,
+            resources,
+            routes,
+            vendor,
+            artisan,
+            composer.json,
+            composer.lock,
+            package.json,
+            package-lock.json,
+            vite.config.js
+          target: ~/tj-rent-car
           overwrite: true
+          rm: false
+          exclude: |
+            storage/app/*,
+            storage/framework/cache/*,
+            storage/framework/sessions/*,
+            storage/framework/views/*,
+            storage/logs/*
 
-      - name: Run deployment commands
-        uses: appleboy/ssh-action@master
+      - name: ⚙️ Run deployment commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e  # Exit on error
+
+            cd ~/tj-rent-car
+
+            echo "🔧 Setting up environment..."
+
+            # Backup current .env if exists
+            if [ -f .env ]; then
+              cp .env .env.backup
+            fi
+
+            # Ensure .env exists
+            if [ ! -f .env ]; then
+              echo "⚠️ .env not found, please create manually on server!"
+              exit 1
+            fi
+
+            echo "📁 Ensuring storage directories exist..."
+            mkdir -p storage/app/public
+            mkdir -p storage/framework/cache
+            mkdir -p storage/framework/sessions
+            mkdir -p storage/framework/views
+            mkdir -p storage/logs
+            mkdir -p bootstrap/cache
+
+            echo "🔄 Enabling maintenance mode..."
+            php artisan down --retry=60 || true
+
+            echo "🗑️ Clearing old cache..."
+            php artisan cache:clear || true
+            php artisan config:clear || true
+            php artisan route:clear || true
+            php artisan view:clear || true
+
+            echo "📦 Installing/updating dependencies..."
+            composer install --no-dev --optimize-autoloader --no-interaction
+
+            echo "🔗 Creating storage symlink..."
+            php artisan storage:link || true
+
+            echo "🔐 Setting permissions..."
+            chmod -R 755 storage bootstrap/cache
+            chmod -R 775 storage/logs
+
+            echo "🗄️ Running migrations..."
+            php artisan migrate --force --no-interaction
+
+            echo "⚡ Optimizing application..."
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize
+
+            echo "🔄 Restarting queue workers..."
+            php artisan queue:restart || true
+
+            echo "✅ Taking application out of maintenance mode..."
+            php artisan up
+
+            echo "🎉 Deployment completed successfully!"
+
+      - name: 🔍 Verify deployment
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -53,10 +185,57 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd ~/tj-rent-car
-            composer install --no-dev --optimize-autoloader
-            php artisan storage:link
-            php artisan migrate --force
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan optimize
+            php artisan --version
+            echo "✅ Laravel is running!"
+
+      - name: 📊 Generate deployment summary
+        if: always()
+        run: |
+          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: Production" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Author**: @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Triggered by**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Time**: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+
+  # Job 3: Rollback on failure
+  rollback:
+    needs: deploy
+    if: failure()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔄 Rollback deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ~/tj-rent-car
+
+            echo "⚠️ Deployment failed! Starting rollback..."
+
+            # Restore .env backup if exists
+            if [ -f .env.backup ]; then
+              mv .env.backup .env
+            fi
+
+            # Take application out of maintenance mode
+            php artisan up || true
+
+            echo "✅ Rollback completed. Application restored to previous state."
+
+      - name: 📧 Notify deployment failure
+        if: always()
+        run: |
+          echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Deployment has failed and was rolled back." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please check the logs for details:" >> $GITHUB_STEP_SUMMARY
+          echo "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
