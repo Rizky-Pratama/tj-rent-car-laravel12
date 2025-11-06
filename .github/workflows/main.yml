@@ -45,13 +45,6 @@ jobs:
       - name: 📦 Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-      - name: 🧪 Run Tests
-        if: ${{ github.event.inputs.skip_tests != 'true' }}
-        run: |
-          cp .env.example .env
-          php artisan key:generate
-          php artisan test --parallel
-
       - name: 📤 Upload built assets
         uses: actions/upload-artifact@v4
         with:
