@@ -52,15 +52,18 @@ class UpdateOverdueTransactions extends Command
 
     protected function processOverdueTransaction(Transaksi $transaksi, Carbon $now)
     {
-        // Hitung durasi keterlambatan
-        $seharusnyaKembali = Carbon::parse($transaksi->tanggal_kembali);
-        $keterlambatanFloat = $seharusnyaKembali->diffInRealDays($now);
-        $keterlambatan = (int) floor($keterlambatanFloat);
+        $seharusnyaKembali = Carbon::parse($transaksi->tanggal_kembali)->startOfDay();
+        $tanggalSekarang = $now->copy()->startOfDay();
+        $keterlambatan = $seharusnyaKembali->diffInDays($tanggalSekarang);
 
         $this->info('--- Processing Transaksi #' . $transaksi->no_transaksi . ' ---');
-        $this->info('Keterlambatan: ' . $keterlambatan . ' hari');
+        $this->info('Now (actual): ' . $now->format('Y-m-d H:i:s'));
+        $this->info('Now (date only): ' . $tanggalSekarang->format('Y-m-d'));
+        $this->info('Seharusnya kembali (date only): ' . $seharusnyaKembali->format('Y-m-d'));
+        $this->info('Keterlambatan (hari kalender): ' . $keterlambatan . ' hari');
 
         if ($keterlambatan <= 0) {
+            $this->info('Tidak ada keterlambatan, skip.');
             return;
         }
 
