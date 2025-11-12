@@ -23,7 +23,7 @@ class UpdateOverdueTransactions extends Command
 
             // Cari transaksi yang masih berjalan dan sudah melewati batas waktu
             $overdueTransactions = Transaksi::with(['hargaSewa.jenissewa', 'mobil'])
-                ->where('status', 'berjalan')
+                ->whereIn('status', ['berjalan', 'telat'])
                 ->where('tanggal_kembali', '<', $now)
                 ->get();
 
@@ -41,7 +41,6 @@ class UpdateOverdueTransactions extends Command
             Log::info($message);
 
             return 0;
-
         } catch (\Exception $e) {
             DB::rollBack();
             $error = "Error saat memproses transaksi telat: " . $e->getMessage();
@@ -65,7 +64,6 @@ class UpdateOverdueTransactions extends Command
             return;
         }
 
-        $hargaPerHari = $transaksi->hargaSewa->harga;
         $dendaPerHari = $transaksi->hargaSewa->jenissewa->tarif_denda_per_hari;
         $totalDenda = $dendaPerHari * $keterlambatan;
 
