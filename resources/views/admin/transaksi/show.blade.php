@@ -239,7 +239,8 @@
                             </div>
                             <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Catatan</h3>
                         </div>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ $transaksi->catatan }}</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">{{ $transaksi->catatan }}
+                        </p>
                     </div>
                 @endif
 
@@ -389,16 +390,6 @@
                         @endif
                     </div>
                 @endif
-
-                <!-- Catatan -->
-                @if ($transaksi->catatan)
-                    <div class="bg-white shadow-lg rounded-lg p-6">
-                        <h2 class="text-xl font-semibold text-gray-800 mb-4">Catatan</h2>
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <p class="text-sm text-gray-700 whitespace-pre-line">{{ $transaksi->catatan }}</p>
-                        </div>
-                    </div>
-                @endif
             </div>
 
             <!-- Sidebar -->
@@ -537,6 +528,13 @@
                         Aksi Cepat
                     </h3>
                     <div class="space-y-2">
+                        @if (!in_array($transaksi->status, ['selesai', 'batal']))
+                            <a href="{{ route('admin.transaksi.payment', $transaksi->id) }}"
+                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg inline-flex items-center justify-center">
+                                <iconify-icon icon="heroicons:plus-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
+                                Tambah Pembayaran
+                            </a>
+                        @endif
                         @if ($transaksi->status == 'pending')
                             <form action="{{ route('admin.transaksi.update-status', $transaksi->id) }}" method="POST">
                                 @csrf
@@ -581,20 +579,14 @@
                                     Selesai Sewa
                                 </button>
                             </form>
-
-                            <a href="{{ route('admin.pembayaran.create', ['transaksi_id' => $transaksi->id]) }}"
-                                class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg inline-flex items-center justify-center">
-                                <iconify-icon icon="heroicons:plus-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
-                                Tambah Pembayaran
-                            </a>
                         @endif
 
                         @if (in_array($transaksi->status, ['berjalan', 'telat']))
-                            <button onclick="openAddCostModal()"
+                            <button @click="$dispatch('open-cost-modal')"
                                 class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded-lg text-sm">
                                 💰 Tambah Biaya
                             </button>
-                            <button onclick="openAddFineModal()"
+                            <button @click="$dispatch('open-fine-modal')"
                                 class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded-lg text-sm">
                                 ⚠️ Tambah Denda
                             </button>
@@ -610,25 +602,37 @@
         </div>
 
         <!-- Modal Tambah Biaya -->
-        <div id="addCostModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div x-data="{ open: false }" @open-cost-modal.window="open = true" x-show="open" x-cloak
+            class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+            <div class="relative top-20 mx-auto p-5 w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
+                @click.away="open = false" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform scale-90"
+                x-transition:enter-end="opacity-100 transform scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 transform scale-100"
+                x-transition:leave-end="opacity-0 transform scale-90">
                 <div class="mt-3">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Tambah Biaya Tambahan</h3>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Tambah Biaya Tambahan</h3>
                     <form action="{{ route('admin.transaksi.add-biaya', $transaksi->id) }}" method="POST">
                         @csrf
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah Biaya</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Jumlah
+                                Biaya</label>
                             <input type="number" name="biaya_tambahan" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
+                            <label
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Keterangan</label>
                             <textarea name="keterangan_biaya" required rows="3"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"></textarea>
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea>
                         </div>
                         <div class="flex justify-end space-x-3">
-                            <button type="button" onclick="closeAddCostModal()"
-                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                            <button type="button" @click="open = false"
+                                class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500">
                                 Batal
                             </button>
                             <button type="submit"
@@ -642,25 +646,37 @@
         </div>
 
         <!-- Modal Tambah Denda -->
-        <div id="addFineModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden overflow-y-auto h-full w-full z-50">
-            <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div x-data="{ open: false }" @open-fine-modal.window="open = true" x-show="open" x-cloak
+            class="fixed inset-0 bg-gray-600/50 overflow-y-auto h-full w-full z-50"
+            x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+            <div class="relative top-20 mx-auto p-5 w-96 shadow-lg rounded-md bg-white dark:bg-gray-800"
+                @click.away="open = false" x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform scale-90"
+                x-transition:enter-end="opacity-100 transform scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 transform scale-100"
+                x-transition:leave-end="opacity-0 transform scale-90">
                 <div class="mt-3">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Tambah Denda Manual</h3>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Tambah Denda Manual</h3>
                     <form action="{{ route('admin.transaksi.add-denda', $transaksi->id) }}" method="POST">
                         @csrf
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah Denda</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Jumlah
+                                Denda</label>
                             <input type="number" name="denda_manual" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500">
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                         </div>
                         <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Keterangan</label>
+                            <label
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Keterangan</label>
                             <textarea name="keterangan_denda" required rows="3"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"></textarea>
+                                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea>
                         </div>
                         <div class="flex justify-end space-x-3">
-                            <button type="button" onclick="closeAddFineModal()"
-                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                            <button type="button" @click="open = false"
+                                class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500">
                                 Batal
                             </button>
                             <button type="submit" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
@@ -671,22 +687,4 @@
                 </div>
             </div>
         </div>
-
-        <script>
-            function openAddCostModal() {
-                document.getElementById('addCostModal').classList.remove('hidden');
-            }
-
-            function closeAddCostModal() {
-                document.getElementById('addCostModal').classList.add('hidden');
-            }
-
-            function openAddFineModal() {
-                document.getElementById('addFineModal').classList.remove('hidden');
-            }
-
-            function closeAddFineModal() {
-                document.getElementById('addFineModal').classList.add('hidden');
-            }
-        </script>
     @endsection

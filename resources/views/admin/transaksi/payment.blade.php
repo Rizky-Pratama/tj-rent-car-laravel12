@@ -102,10 +102,10 @@
                                     <select name="metode" required
                                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
                                         <option value="">-- Pilih Metode --</option>
-                                        <option value="cash">💵 Cash / Tunai</option>
                                         <option value="transfer">🏦 Transfer Bank</option>
-                                        <option value="debit">💳 Kartu Debit</option>
-                                        <option value="kredit">💎 Kartu Kredit</option>
+                                        <option value="tunai">💵 Cash / Tunai</option>
+                                        <option value="qris">📲 QRIS</option>
+                                        <option value="kartu">💳 Kartu Kredit</option>
                                         <option value="ewallet">📱 E-Wallet</option>
                                     </select>
                                 </div>
@@ -157,7 +157,7 @@
                                 </label>
                                 <div
                                     class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-indigo-400 transition-colors">
-                                    <input type="file" name="bukti_pembayaran" accept="image/*,.pdf"
+                                    <input type="file" name="bukti_bayar" accept="image/*,.pdf"
                                         class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
                                     <p class="text-xs text-gray-500 mt-2">📄 Format: JPG, PNG, PDF • Maksimal 2MB</p>
                                 </div>

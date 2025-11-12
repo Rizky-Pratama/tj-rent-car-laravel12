@@ -19,6 +19,35 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" x-data="editTransactionForm()">
             <!-- Left: Form Sections -->
             <div class="lg:col-span-2 space-y-6">
+                @if ($errors->any())
+                    <div
+                        class="p-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg shadow-lg mb-6 animate-shake">
+                        <div class="flex items-start space-x-3">
+                            <iconify-icon icon="heroicons:exclamation-triangle-20-solid"
+                                class="w-8 h-8 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0"></iconify-icon>
+                            <div class="flex-1">
+                                <h4 class="text-base font-bold text-red-800 dark:text-red-200 mb-3">
+                                    ⚠️ TERJADI KESALAHAN
+                                </h4>
+                                <ul class="space-y-2 text-sm text-red-700 dark:text-red-300">
+                                    @foreach ($errors->all() as $error)
+                                        <li class="flex items-start font-medium">
+                                            <span class="mr-2 font-bold">▶</span>
+                                            <span>{{ $error }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                        // Alert untuk memastikan terlihat
+                        @foreach ($errors->all() as $error)
+                            alert('ERROR: {{ addslashes($error) }}');
+                            @break
+                        @endforeach
+                    </script>
+                @endif
                 <form action="{{ route('admin.transaksi.update', $transaksi->id) }}" method="POST" class="space-y-6">
                     @csrf
                     @method('PUT')
@@ -102,7 +131,6 @@
                     </div>
 
                     <!-- Step 2: Car Selection -->
-                    <!-- Step 2: Car Selection -->
                     <div
                         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <div class="flex items-center justify-between mb-6">
@@ -119,6 +147,7 @@
                                 <span class="text-sm text-green-600 dark:text-green-400">Terpilih</span>
                             </div>
                         </div>
+
                         <div class="space-y-6">
                             <!-- Car Selection -->
                             <div>
@@ -156,7 +185,7 @@
                                             class="w-4 h-4 text-gray-500"></iconify-icon>
                                         <div>
                                             <span class="text-gray-600 dark:text-gray-400">Tahun:</span>
-                                            <span x-text="carInfo.year"
+                                            <span x-text="carInfo.tahun"
                                                 class="font-medium text-gray-900 dark:text-white ml-1"></span>
                                         </div>
                                     </div>
@@ -165,7 +194,7 @@
                                             class="w-4 h-4 text-gray-500"></iconify-icon>
                                         <div>
                                             <span class="text-gray-600 dark:text-gray-400">Warna:</span>
-                                            <span x-text="carInfo.color"
+                                            <span x-text="carInfo.warna"
                                                 class="font-medium text-gray-900 dark:text-white ml-1"></span>
                                         </div>
                                     </div>
@@ -174,7 +203,7 @@
                                             class="w-4 h-4 text-gray-500"></iconify-icon>
                                         <div>
                                             <span class="text-gray-600 dark:text-gray-400">Kapasitas:</span>
-                                            <span x-text="carInfo.capacity"
+                                            <span x-text="carInfo.kapasitas"
                                                 class="font-medium text-gray-900 dark:text-white ml-1"></span>
                                         </div>
                                     </div>
@@ -183,7 +212,7 @@
                                             class="w-4 h-4 text-gray-500"></iconify-icon>
                                         <div>
                                             <span class="text-gray-600 dark:text-gray-400">Transmisi:</span>
-                                            <span x-text="carInfo.transmission"
+                                            <span x-text="carInfo.transmisi"
                                                 class="font-medium text-gray-900 dark:text-white ml-1"></span>
                                         </div>
                                     </div>
@@ -194,22 +223,39 @@
                             <div x-show="selectedCar" x-transition>
                                 <label for="harga_sewa_id"
                                     class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                    <iconify-icon icon="heroicons:tag-20-solid"
-                                        class="w-4 h-4 inline mr-1"></iconify-icon>
-                                    Paket Sewa *
+                                    Pilih Paket Sewa <span class="text-red-500">*</span>
                                 </label>
-                                <select name="harga_sewa_id" id="harga_sewa_id" required x-model="selectedPricing"
-                                    @change="updateCalculation()"
-                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
-                                    <option value="">-- Pilih Paket Sewa --</option>
-                                    @foreach ($hargaSewa as $item)
-                                        <option value="{{ $item->id }}" data-harga="{{ $item->harga_per_hari }}"
-                                            {{ old('harga_sewa_id', $transaksi->harga_sewa_id) == $item->id ? 'selected' : '' }}>
-                                            {{ $item->jenisSewa->nama_jenis }} - Rp
-                                            {{ number_format($item->harga_per_hari, 0, ',', '.') }}/hari
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <div class="grid grid-cols-1 gap-3" x-show="pricingOptions.length > 0">
+                                    <template x-for="pricing in pricingOptions" :key="pricing.id">
+                                        <label class="relative cursor-pointer">
+                                            <input type="radio" name="harga_sewa_id" :value="pricing.id"
+                                                x-model="selectedPricing" @change="updateCalculation()"
+                                                class="sr-only peer">
+                                            <div
+                                                class="p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 transition-all">
+                                                <div class="flex items-center justify-between">
+                                                    <div>
+                                                        <h4 class="font-medium text-gray-900 dark:text-white"
+                                                            x-text="pricing.jenis_sewa.nama_jenis"></h4>
+                                                        <p class="text-sm text-gray-600 dark:text-gray-400"
+                                                            x-text="pricing.jenis_sewa.deskripsi || 'Paket rental standar'">
+                                                        </p>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <p class="text-lg font-bold text-indigo-600 dark:text-indigo-400"
+                                                            x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(pricing.harga_per_hari)">
+                                                        </p>
+                                                        <p class="text-sm text-gray-500 dark:text-gray-400">per hari</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </template>
+                                </div>
+                                <div x-show="pricingOptions.length === 0"
+                                    class="text-center py-4 text-gray-500 dark:text-gray-400">
+                                    Pilih mobil terlebih dahulu untuk melihat paket harga
+                                </div>
                                 @error('harga_sewa_id')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -222,32 +268,47 @@
                         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <div class="flex items-center justify-between mb-6">
                             <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center">
+                                <div
+                                    class="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
                                     <iconify-icon icon="heroicons:calendar-days-20-solid"
-                                        class="w-4 h-4 text-white"></iconify-icon>
+                                        class="w-4 h-4 text-green-600 dark:text-green-400"></iconify-icon>
                                 </div>
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Periode Sewa</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Tentukan tanggal dan durasi sewa
-                                    </p>
-                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Periode & Sopir</h3>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <!-- Rental Date -->
                             <div>
                                 <label for="tanggal_sewa"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                    <iconify-icon icon="heroicons:calendar-20-solid"
-                                        class="w-4 h-4 inline mr-1"></iconify-icon>
-                                    Tanggal Mulai Sewa *
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Tanggal Mulai Sewa <span class="text-red-500">*</span>
                                 </label>
-                                <input type="date" name="tanggal_sewa" id="tanggal_sewa" required
+                                <input type="date" name="tanggal_sewa" id="tanggal_sewa" x-model="rentalDate"
+                                    @change="updateCalculation(); validateAvailability()" required
                                     value="{{ old('tanggal_sewa', $transaksi->tanggal_sewa->format('Y-m-d')) }}"
-                                    x-model="rentalDate" @change="updateCalculation()" min="{{ date('Y-m-d') }}"
-                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
+                                    min="{{ date('Y-m-d') }}"
+                                    max="{{ date('Y-m-d', strtotime('+' . $settings['advance_booking_days'] . ' days')) }}"
+                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 border @error('tanggal_sewa') border-red-500 dark:border-red-500 @else border-gray-200 dark:border-gray-600 @enderror rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
                                 @error('tanggal_sewa')
+                                    <div
+                                        class="mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                                        <p class="text-red-600 dark:text-red-400 text-sm font-medium">{{ $message }}</p>
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <!-- Return Date -->
+                            <div>
+                                <label for="tanggal_kembali"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Tanggal Kembali <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" name="tanggal_kembali" id="tanggal_kembali" x-model="returnDate"
+                                    @change="calculateDurationFromDates()" required
+                                    :min="rentalDate || '{{ date('Y-m-d') }}'"
+                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
+                                @error('tanggal_kembali')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -255,55 +316,64 @@
                             <!-- Duration -->
                             <div>
                                 <label for="durasi_hari"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                    <iconify-icon icon="heroicons:clock-20-solid"
-                                        class="w-4 h-4 inline mr-1"></iconify-icon>
-                                    Durasi Sewa (Hari) *
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Durasi Sewa (Hari) <span class="text-red-500">*</span>
                                 </label>
-                                <input type="number" name="durasi_hari" id="durasi_hari" required
-                                    value="{{ old('durasi_hari', $transaksi->durasi_hari) }}" x-model.number="duration"
-                                    @input="updateCalculation()" min="1" max="30" step="1"
-                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
-                                <input type="hidden" name="tanggal_kembali" :value="getReturnDate()">
+                                <div class="relative">
+                                    <input type="number" name="durasi_hari" id="durasi_hari" x-model="duration"
+                                        @input="updateCalculation(); validateAvailability()" required min="1"
+                                        max="365" value="{{ old('durasi_hari', $transaksi->durasi_hari) }}"
+                                        class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                        <span class="text-gray-500 dark:text-gray-400 text-sm">hari</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    Rata-rata: {{ $analytics['avg_duration'] }} hari | Min:
+                                    {{ $settings['min_rental_days'] }} - Max: {{ $settings['max_rental_days'] }} hari
+                                </p>
                                 @error('durasi_hari')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
 
                             <!-- Quick Duration Buttons -->
-                            <div class="md:col-span-2">
-                                <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Durasi Populer:</p>
+                            <div class="md:col-span-3">
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Durasi Populer:</p>
                                 <div class="flex flex-wrap gap-2">
-                                    <button type="button" @click="setDuration(1)"
-                                        class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-800 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">1
-                                        Hari</button>
-                                    <button type="button" @click="setDuration(3)"
-                                        class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-800 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">3
-                                        Hari</button>
-                                    <button type="button" @click="setDuration(7)"
-                                        class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-800 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">1
-                                        Minggu</button>
-                                    <button type="button" @click="setDuration(14)"
-                                        class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-800 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">2
-                                        Minggu</button>
-                                    <button type="button" @click="setDuration(30)"
-                                        class="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 hover:bg-indigo-100 dark:hover:bg-indigo-800 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">1
-                                        Bulan</button>
+                                    <template x-for="day in [1, 3, 7, 14, 30]" :key="day">
+                                        <button type="button" @click="setDuration(day)"
+                                            :class="duration == day ? 'bg-indigo-600 text-white' :
+                                                'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'"
+                                            class="px-3 py-1 rounded-lg text-sm font-medium transition-colors duration-200">
+                                            <span x-text="day"></span> hari
+                                        </button>
+                                    </template>
                                 </div>
                             </div>
 
-                            <!-- Return Date Display -->
-                            <div class="md:col-span-2" x-show="rentalDate && duration">
-                                <div
-                                    class="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                                    <div class="flex items-center space-x-2 mb-1">
-                                        <iconify-icon icon="heroicons:calendar-20-solid"
-                                            class="w-4 h-4 text-purple-600 dark:text-purple-400"></iconify-icon>
-                                        <span class="text-sm font-medium text-purple-800 dark:text-purple-200">Tanggal
-                                            Pengembalian</span>
+                            <!-- Rental Period Summary -->
+                            <div class="md:col-span-3" x-show="rentalDate && returnDate && duration">
+                                <div x-transition
+                                    class="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                        <div>
+                                            <span class="text-gray-600 dark:text-gray-400">Tanggal Sewa:</span>
+                                            <div class="font-semibold text-indigo-600 dark:text-indigo-400"
+                                                x-text="formatDisplayDate(rentalDate)"></div>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600 dark:text-gray-400">Tanggal Kembali:</span>
+                                            <div class="font-semibold text-indigo-600 dark:text-indigo-400"
+                                                x-text="formatDisplayDate(returnDate)"></div>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600 dark:text-gray-400">Total Durasi:</span>
+                                            <div class="font-semibold text-indigo-600 dark:text-indigo-400">
+                                                <span x-text="duration"></span> hari
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p x-text="getReturnDate()"
-                                        class="text-sm text-purple-700 dark:text-purple-300 font-medium"></p>
                                 </div>
                             </div>
                         </div>
@@ -312,58 +382,63 @@
                         <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6" x-show="requiresDriver"
                             x-transition>
                             <label for="sopir_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                <iconify-icon icon="heroicons:user-20-solid" class="w-4 h-4 inline mr-1"></iconify-icon>
-                                Pilihan Sopir <span class="text-red-500" x-show="requiresDriver">*</span>
+                                Sopir <span class="text-red-500" x-show="requiresDriver">*</span>
                                 <span class="text-gray-500" x-show="!requiresDriver">(Opsional)</span>
                             </label>
-                            <div class="space-y-3">
-                                <!-- Self Drive Option - only show if driver not required -->
-                                <label x-show="!requiresDriver"
-                                    class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                            <div class="flex flex-col gap-4">
+                                <!-- No Driver Option - only show if driver not required -->
+                                <label class="relative cursor-pointer" x-show="!requiresDriver">
                                     <input type="radio" name="sopir_id" value="" x-model="selectedDriver"
-                                        @change="updateCalculation()"
-                                        {{ old('sopir_id', $transaksi->sopir_id) == '' ? 'checked' : '' }}
-                                        class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 dark:focus:ring-indigo-400">
-                                    <div class="ml-3">
-                                        <div class="flex items-center space-x-2">
-                                            <iconify-icon icon="heroicons:key-20-solid"
-                                                class="w-4 h-4 text-gray-600 dark:text-gray-400"></iconify-icon>
-                                            <span class="text-sm font-medium text-gray-900 dark:text-white">Self
-                                                Drive</span>
+                                        @change="updateCalculation()" class="sr-only peer">
+                                    <div
+                                        class="p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 transition-all">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-3">
+                                                <div
+                                                    class="w-10 h-10 bg-gray-100 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                                                    <iconify-icon icon="heroicons:key-20-solid"
+                                                        class="w-5 h-5 text-gray-500 dark:text-gray-400"></iconify-icon>
+                                                </div>
+                                                <div>
+                                                    <h4 class="font-medium text-gray-900 dark:text-white">Tanpa Sopir
+                                                        (Lepas Kunci)</h4>
+                                                    <p class="text-sm text-gray-600 dark:text-gray-400">Anda mengendarai
+                                                        sendiri</p>
+                                                </div>
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-lg font-bold text-green-600 dark:text-green-400">GRATIS</p>
+                                            </div>
                                         </div>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">Anda mengemudi sendiri</p>
                                     </div>
                                 </label>
 
-                                <!-- Driver Options -->
                                 @foreach ($sopir as $item)
-                                    <label
-                                        class="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                                    <label class="relative cursor-pointer">
                                         <input type="radio" name="sopir_id" value="{{ $item->id }}"
                                             x-model="selectedDriver" @change="updateCalculation()"
                                             {{ old('sopir_id', $transaksi->sopir_id) == $item->id ? 'checked' : '' }}
-                                            :required="requiresDriver"
-                                            class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 dark:focus:ring-indigo-400">
-                                        <div class="ml-3 flex-1">
+                                            :required="requiresDriver" class="sr-only peer">
+                                        <div
+                                            class="p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 transition-all">
                                             <div class="flex items-center justify-between">
-                                                <div class="flex items-center space-x-2">
-                                                    <iconify-icon icon="heroicons:user-20-solid"
-                                                        class="w-4 h-4 text-gray-600 dark:text-gray-400"></iconify-icon>
-                                                    <span
-                                                        class="text-sm font-medium text-gray-900 dark:text-white">{{ $item->nama }}</span>
+                                                <div class="flex items-center space-x-3">
+                                                    <div
+                                                        class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center">
+                                                        <iconify-icon icon="heroicons:user-20-solid"
+                                                            class="w-5 h-5 text-indigo-600 dark:text-indigo-400"></iconify-icon>
+                                                    </div>
+                                                    <div>
+                                                        <h4 class="font-medium text-gray-900 dark:text-white">
+                                                            {{ $item->nama }}</h4>
+                                                        <div
+                                                            class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                                            <iconify-icon icon="heroicons:phone-20-solid"
+                                                                class="w-4 h-4"></iconify-icon>
+                                                            <span>{{ $item->telepon }}</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                @if ($item->tarif_per_hari)
-                                                    <span class="text-xs text-gray-500 dark:text-gray-400">
-                                                        Rp {{ number_format($item->tarif_per_hari, 0, ',', '.') }}/hari
-                                                    </span>
-                                                @endif
-                                            </div>
-                                            <div
-                                                class="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                <span>{{ $item->telepon }}</span>
-                                                @if ($item->pengalaman_tahun)
-                                                    <span>{{ $item->pengalaman_tahun }} tahun pengalaman</span>
-                                                @endif
                                             </div>
                                         </div>
                                     </label>
@@ -403,9 +478,10 @@
                     <div
                         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <div class="flex items-center space-x-3 mb-6">
-                            <div class="w-8 h-8 bg-yellow-600 rounded-full flex items-center justify-center">
-                                <iconify-icon icon="heroicons:pencil-square-20-solid"
-                                    class="w-4 h-4 text-white"></iconify-icon>
+                            <div
+                                class="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center">
+                                <iconify-icon icon="heroicons:document-text-20-solid"
+                                    class="w-4 h-4 text-purple-600 dark:text-purple-400"></iconify-icon>
                             </div>
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Catatan & Informasi Tambahan
                             </h3>
@@ -413,13 +489,11 @@
 
                         <div>
                             <label for="catatan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                <iconify-icon icon="heroicons:document-text-20-solid"
-                                    class="w-4 h-4 inline mr-1"></iconify-icon>
-                                Catatan Khusus (Opsional)
+                                Catatan Transaksi (Opsional)
                             </label>
                             <textarea name="catatan" id="catatan" rows="4"
-                                class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200 resize-none"
-                                placeholder="Contoh: Perubahan keperluan, pickup di bandara, butuh child seat, dll.">{{ old('catatan', $transaksi->catatan) }}</textarea>
+                                class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200 resize-none"
+                                placeholder="Contoh: Keperluan wisata keluarga, pickup di bandara, butuh child seat, dll.">{{ old('catatan', $transaksi->catatan) }}</textarea>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Informasi ini akan membantu admin dan
                                 sopir mempersiapkan layanan yang sesuai</p>
                             @error('catatan')
@@ -439,7 +513,7 @@
                             :class="isFormValid() ? 'bg-indigo-600 hover:bg-indigo-700 text-white' :
                                 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'"
                             class="inline-flex items-center px-6 py-3 text-sm font-medium rounded-xl transition-colors duration-200">
-                            <iconify-icon icon="heroicons:check-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
+                            <iconify-icon icon="heroicons:pencil-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
                             <span x-text="isFormValid() ? 'Update Transaksi' : 'Lengkapi Data'"></span>
                         </button>
                     </div>
@@ -463,54 +537,55 @@
                         <!-- Cost Breakdown -->
                         <div class="space-y-4" x-show="selectedPricing && duration > 0">
                             <!-- Car Rental Cost -->
-                            <div class="flex justify-between items-center p-3 bg-white/60 dark:bg-white/10 rounded-lg">
-                                <div>
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Sewa Mobil</span>
-                                    <p class="text-xs text-gray-500 dark:text-gray-500"
-                                        x-text="duration + ' hari × Rp ' + dailyCarRate.toLocaleString('id-ID')"></p>
+                            <div
+                                class="flex items-center justify-between py-2 border-b border-indigo-200 dark:border-indigo-700">
+                                <div class="flex items-center space-x-2">
+                                    <iconify-icon icon="heroicons:truck-20-solid"
+                                        class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></iconify-icon>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Sewa Mobil</span>
                                 </div>
-                                <span class="font-semibold text-gray-900 dark:text-white"
-                                    x-text="'Rp ' + carRentalCost.toLocaleString('id-ID')"></span>
+                                <div class="text-right">
+                                    <p class="font-medium text-gray-900 dark:text-white"
+                                        x-text="formatCurrency(carRentalCost)"></p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400"
+                                        x-text="`${formatCurrency(dailyCarRate)} × ${duration} hari`"></p>
+                                </div>
                             </div>
 
                             <!-- Driver Cost -->
                             <div x-show="driverCost > 0"
-                                class="flex justify-between items-center p-3 bg-white/60 dark:bg-white/10 rounded-lg">
-                                <div>
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Biaya Sopir</span>
-                                    <p class="text-xs text-gray-500 dark:text-gray-500"
-                                        x-text="duration + ' hari × Rp ' + dailyDriverRate.toLocaleString('id-ID')"></p>
+                                class="flex items-center justify-between py-2 border-b border-indigo-200 dark:border-indigo-700">
+                                <div class="flex items-center space-x-2">
+                                    <iconify-icon icon="heroicons:user-20-solid"
+                                        class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></iconify-icon>
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">Sopir</span>
                                 </div>
-                                <span class="font-semibold text-gray-900 dark:text-white"
-                                    x-text="'Rp ' + driverCost.toLocaleString('id-ID')"></span>
+                                <div class="text-right">
+                                    <p class="font-medium text-gray-900 dark:text-white"
+                                        x-text="formatCurrency(driverCost)"></p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400"
+                                        x-text="`${formatCurrency(dailyDriverRate)} × ${duration} hari`"></p>
+                                </div>
                             </div>
 
                             <!-- Total Cost -->
                             <div
-                                class="flex justify-between items-center p-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg text-white">
-                                <span class="font-semibold">Total Biaya</span>
-                                <span class="text-xl font-bold" x-text="'Rp ' + totalCost.toLocaleString('id-ID')"></span>
+                                class="flex items-center justify-between pt-4 border-t-2 border-indigo-300 dark:border-indigo-600">
+                                <span class="text-lg font-semibold text-gray-900 dark:text-white">Total</span>
+                                <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400"
+                                    x-text="formatCurrency(totalCost)"></span>
                             </div>
                         </div>
 
-                        <!-- Current Transaction Info -->
-                        <div x-show="!selectedPricing || duration === 0" class="space-y-4">
-                            <div class="p-3 bg-white/60 dark:bg-white/10 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Status Saat Ini</span>
-                                    <span
-                                        class="px-2 py-1 text-xs rounded-full {{ $statusConfig[$transaksi->status]['bg'] ?? 'bg-gray-100' }} {{ $statusConfig[$transaksi->status]['text'] ?? 'text-gray-800' }}">
-                                        {{ $statusConfig[$transaksi->status]['label'] ?? ucfirst($transaksi->status) }}
-                                    </span>
-                                </div>
+                        <!-- Placeholder when no selection -->
+                        <div x-show="!selectedPricing || duration === 0" class="text-center py-8">
+                            <div
+                                class="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <iconify-icon icon="heroicons:currency-dollar-20-solid"
+                                    class="w-8 h-8 text-indigo-600 dark:text-indigo-400"></iconify-icon>
                             </div>
-                            <div class="p-3 bg-white/60 dark:bg-white/10 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">Total Saat Ini</span>
-                                    <span class="font-bold text-gray-900 dark:text-white">Rp
-                                        {{ number_format($transaksi->total_biaya, 0, ',', '.') }}</span>
-                                </div>
-                            </div>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm">Pilih mobil dan durasi untuk melihat
+                                perhitungan biaya</p>
                         </div>
                     </div>
 
@@ -525,86 +600,62 @@
                         <div class="space-y-3 text-sm">
                             <!-- Customer Info -->
                             <div x-show="selectedCustomer">
-                                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                                    <span class="text-gray-600 dark:text-gray-400">Pelanggan:</span>
-                                    <span x-text="customerInfo.name"
-                                        class="font-medium text-gray-900 dark:text-white"></span>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <iconify-icon icon="heroicons:user-20-solid"
+                                        class="w-4 h-4 text-gray-500"></iconify-icon>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Pelanggan</span>
                                 </div>
-                                <div class="flex justify-between py-1 text-xs text-gray-500 dark:text-gray-400">
-                                    <span>Telepon:</span>
-                                    <span x-text="customerInfo.phone"></span>
-                                </div>
+                                <p class="text-gray-900 dark:text-white ml-6" x-text="customerInfo.nama"></p>
+                                <p class="text-gray-600 dark:text-gray-400 ml-6" x-text="customerInfo.telepon"></p>
                             </div>
 
                             <!-- Car Info -->
                             <div x-show="selectedCar">
-                                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                                    <span class="text-gray-600 dark:text-gray-400">Kendaraan:</span>
-                                    <span x-text="carInfo.brand + ' ' + carInfo.model"
-                                        class="font-medium text-gray-900 dark:text-white"></span>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <iconify-icon icon="heroicons:truck-20-solid"
+                                        class="w-4 h-4 text-gray-500"></iconify-icon>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Mobil</span>
                                 </div>
-                                <div class="flex justify-between py-1 text-xs text-gray-500 dark:text-gray-400">
-                                    <span>Plat Nomor:</span>
-                                    <span x-text="carInfo.plat"></span>
-                                </div>
+                                <p class="text-gray-900 dark:text-white ml-6" x-text="`${carInfo.merk} ${carInfo.model}`">
+                                </p>
+                                <p class="text-gray-600 dark:text-gray-400 ml-6" x-text="carInfo.plat"></p>
                             </div>
 
                             <!-- Rental Period -->
                             <div x-show="rentalDate && duration > 0">
-                                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                                    <span class="text-gray-600 dark:text-gray-400">Periode:</span>
-                                    <span x-text="formatDateRange()"
-                                        class="font-medium text-gray-900 dark:text-white"></span>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <iconify-icon icon="heroicons:calendar-days-20-solid"
+                                        class="w-4 h-4 text-gray-500"></iconify-icon>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Periode</span>
                                 </div>
-                                <div class="flex justify-between py-1 text-xs text-gray-500 dark:text-gray-400">
-                                    <span>Durasi:</span>
-                                    <span x-text="duration + ' hari'"></span>
-                                </div>
+                                <p class="text-gray-900 dark:text-white ml-6" x-text="formatDateRange()"></p>
+                                <p class="text-gray-600 dark:text-gray-400 ml-6" x-text="`${duration} hari`"></p>
                             </div>
 
                             <!-- Driver Info -->
                             <div x-show="selectedDriver">
-                                <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                                    <span class="text-gray-600 dark:text-gray-400">Sopir:</span>
-                                    <span x-text="getDriverInfo().name"
-                                        class="font-medium text-gray-900 dark:text-white"></span>
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <iconify-icon icon="heroicons:user-circle-20-solid"
+                                        class="w-4 h-4 text-gray-500"></iconify-icon>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Sopir</span>
                                 </div>
+                                <p class="text-gray-900 dark:text-white ml-6" x-text="getDriverInfo().name"></p>
+                                <p class="text-gray-600 dark:text-gray-400 ml-6" x-text="getDriverInfo().rate"></p>
                             </div>
                         </div>
 
                         <!-- Validation Status -->
                         <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                             <div class="flex items-center space-x-2">
-                                <iconify-icon
-                                    :icon="isFormValid() ? 'heroicons:check-circle-20-solid' :
-                                        'heroicons:exclamation-circle-20-solid'"
-                                    :class="isFormValid() ? 'text-green-500' : 'text-yellow-500'"
-                                    class="w-5 h-5"></iconify-icon>
+                                <div :class="isFormValid() ? 'bg-green-500' : 'bg-orange-500'"
+                                    class="w-2 h-2 rounded-full"></div>
                                 <span
-                                    :class="isFormValid() ? 'text-green-700 dark:text-green-300' :
-                                        'text-yellow-700 dark:text-yellow-300'"
+                                    :class="isFormValid() ? 'text-green-600 dark:text-green-400' :
+                                        'text-orange-600 dark:text-orange-400'"
                                     class="text-sm font-medium"
-                                    x-text="isFormValid() ? 'Siap untuk diupdate' : 'Lengkapi data yang diperlukan'"></span>
+                                    x-text="isFormValid() ? 'Siap untuk diupdate' : 'Lengkapi data terlebih dahulu'">
+                                </span>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Aksi Cepat</h3>
-
-                        <div class="space-y-3">
-                            <a href="{{ route('admin.transaksi.show', $transaksi->id) }}"
-                                class="block w-full text-center py-2 px-4 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors">
-                                <iconify-icon icon="heroicons:eye-20-solid" class="w-4 h-4 inline mr-2"></iconify-icon>
-                                Lihat Detail
-                            </a>
-                            <a href="{{ route('admin.transaksi.payment', $transaksi->id) }}"
-                                class="block w-full text-center py-2 px-4 bg-indigo-100 hover:bg-indigo-200 dark:bg-indigo-800 dark:hover:bg-indigo-700 text-indigo-700 dark:text-indigo-300 rounded-lg transition-colors">
-                                <iconify-icon icon="heroicons:credit-card-20-solid"
-                                    class="w-4 h-4 inline mr-2"></iconify-icon>
-                                Kelola Pembayaran
-                            </a>
                         </div>
                     </div>
 
@@ -615,12 +666,12 @@
                             <iconify-icon icon="heroicons:light-bulb-20-solid"
                                 class="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5"></iconify-icon>
                             <div>
-                                <p class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-1">Tips Edit
-                                    Transaksi:</p>
+                                <h4 class="text-sm font-medium text-yellow-800 dark:text-yellow-200 mb-2">Tips Edit
+                                    Transaksi</h4>
                                 <ul class="text-xs text-yellow-700 dark:text-yellow-300 space-y-1">
-                                    <li>• Hanya transaksi dengan status pending yang dapat diedit</li>
-                                    <li>• Perubahan mobil/sopir akan mempengaruhi ketersediaan</li>
-                                    <li>• Total biaya akan otomatis dikalkulasi ulang</li>
+                                    <li>• Pastikan ketersediaan mobil untuk periode baru</li>
+                                    <li>• Ubah data sesuai kebutuhan pelanggan</li>
+                                    <li>• Periksa perhitungan biaya setelah perubahan</li>
                                 </ul>
                             </div>
                         </div>
@@ -639,8 +690,9 @@
                     selectedCustomer: '{{ old('pelanggan_id', $transaksi->pelanggan_id) }}',
                     selectedCar: '{{ old('mobil_id', $transaksi->mobil_id) }}',
                     selectedPricing: '{{ old('harga_sewa_id', $transaksi->harga_sewa_id) }}',
-                    selectedDriver: '{{ old('sopir_id', $transaksi->sopir_id) }}',
+                    selectedDriver: '{{ old('sopir_id', $transaksi->sopir_id ?? '') }}',
                     rentalDate: '{{ old('tanggal_sewa', $transaksi->tanggal_sewa->format('Y-m-d')) }}',
+                    returnDate: '',
                     duration: {{ old('durasi_hari', $transaksi->durasi_hari) }},
 
                     // Data Collections
@@ -650,9 +702,7 @@
 
                     // Calculation Variables
                     dailyCarRate: 0,
-                    dailyDriverRate: 0,
                     carRentalCost: 0,
-                    driverCost: 0,
                     totalCost: 0,
 
                     // Driver requirement check
@@ -661,7 +711,7 @@
                     // Data from Backend
                     pelangganData: @json($pelanggan->keyBy('id')),
                     mobilData: @json($mobil->keyBy('id')),
-                    hargaSewaData: @json($hargaSewa->groupBy('mobil_id')),
+                    hargaSewaData: @json($hargaSewa),
                     sopirData: @json($sopir->keyBy('id')),
 
                     init() {
@@ -673,9 +723,16 @@
                             this.updateCarInfo(this.selectedCar);
                             this.loadPricingOptions(this.selectedCar);
                         }
+
+                        // Calculate return date
+                        if (this.rentalDate && this.duration > 0) {
+                            this.calculateReturnDate();
+                        }
+
                         if (this.selectedPricing && this.duration > 0) {
                             this.updateCalculation();
                         }
+
                         // Check initial driver requirement
                         this.checkDriverRequirement();
                     },
@@ -684,8 +741,8 @@
                         if (customerId && this.pelangganData[customerId]) {
                             const customer = this.pelangganData[customerId];
                             this.customerInfo = {
-                                name: customer.nama,
-                                phone: customer.telepon,
+                                nama: customer.nama,
+                                telepon: customer.telepon,
                                 email: customer.email || '-',
                                 alamat: customer.alamat || '-',
                                 ktp: customer.no_ktp || '-'
@@ -697,14 +754,14 @@
                         if (carId && this.mobilData[carId]) {
                             const car = this.mobilData[carId];
                             this.carInfo = {
-                                brand: car.merk,
-                                model: car.model,
-                                plat: car.plat_nomor,
-                                year: car.tahun,
-                                color: car.warna,
-                                capacity: car.kapasitas_penumpang,
-                                transmission: car.transmisi || 'Manual',
-                                fuel: car.jenis_bahan_bakar || 'Bensin'
+                                merk: car.merk || '',
+                                model: car.model || '',
+                                plat: car.plat_nomor || '',
+                                tahun: car.tahun || '',
+                                warna: car.warna || '',
+                                kapasitas: car.kapasitas_penumpang || '',
+                                transmisi: car.transmisi || '',
+                                bahan_bakar: car.jenis_bahan_bakar || ''
                             };
                         }
                     },
@@ -712,29 +769,26 @@
                     loadPricingOptions(carId) {
                         this.pricingOptions = [];
 
-                        // Reset pricing and driver selection when car changes
-                        this.selectedPricing = '';
-                        this.selectedDriver = '';
-                        this.requiresDriver = false;
-
+                        // Don't reset pricing on edit - keep existing selection
                         if (carId && this.hargaSewaData[carId]) {
                             this.pricingOptions = this.hargaSewaData[carId] || [];
                         }
-
-                        console.log('Car changed - pricing and driver selection reset');
                     },
 
                     updateCalculation() {
                         this.dailyCarRate = 0;
-                        this.dailyDriverRate = 0;
                         this.carRentalCost = 0;
-                        this.driverCost = 0;
                         this.totalCost = 0;
+
+                        // Calculate return date when duration or rental date changes
+                        if (this.rentalDate && this.duration > 0) {
+                            this.calculateReturnDate();
+                        }
 
                         // Check driver requirement first
                         this.checkDriverRequirement();
 
-                        // Calculate car rental cost
+                        // Calculate car rental cost (tanpa biaya sopir)
                         if (this.selectedPricing && this.duration > 0) {
                             const pricing = this.pricingOptions.find(p => p.id == this.selectedPricing);
                             if (pricing) {
@@ -743,16 +797,8 @@
                             }
                         }
 
-                        // Calculate driver cost
-                        if (this.selectedDriver && this.duration > 0) {
-                            const driver = this.sopirData[this.selectedDriver];
-                            if (driver && driver.tarif_per_hari) {
-                                this.dailyDriverRate = driver.tarif_per_hari;
-                                this.driverCost = this.dailyDriverRate * this.duration;
-                            }
-                        }
-
-                        this.totalCost = this.carRentalCost + this.driverCost;
+                        // Total = Car Rental only (no driver cost in calculation)
+                        this.totalCost = this.carRentalCost;
                     },
 
                     checkDriverRequirement() {
@@ -762,9 +808,7 @@
                         if (this.selectedPricing) {
                             const pricing = this.pricingOptions.find(p => p.id == this.selectedPricing);
                             if (pricing && pricing.jenis_sewa && pricing.jenis_sewa.slug) {
-                                // Check if slug contains 'driver'
-                                this.requiresDriver = pricing.jenis_sewa.slug.toLowerCase().includes(
-                                    'driver');
+                                this.requiresDriver = pricing.jenis_sewa.slug.includes('driver');
                             }
                         }
 
@@ -772,7 +816,6 @@
                         if (!this.requiresDriver && previousRequirement) {
                             // Driver is no longer required but was before - clear selection
                             this.selectedDriver = '';
-                            console.log('Driver cleared - no longer required for this package');
                         } else if (this.requiresDriver && !this.selectedDriver) {
                             // Driver is required but not selected - keep empty for user to choose
                             console.log('Driver required - user needs to select one');
@@ -781,30 +824,56 @@
 
                     setDuration(days) {
                         this.duration = days;
+                        this.calculateReturnDate();
                         this.updateCalculation();
                     },
 
-                    getReturnDate() {
+                    calculateReturnDate() {
                         if (this.rentalDate && this.duration > 0) {
                             const startDate = new Date(this.rentalDate);
                             const returnDate = new Date(startDate);
-                            returnDate.setDate(startDate.getDate() + parseInt(this.duration));
-                            return returnDate.toISOString().split('T')[0];
+                            // Duration 1 hari = kembali hari yang sama
+                            returnDate.setDate(startDate.getDate() + parseInt(this.duration - 1));
+                            this.returnDate = returnDate.toISOString().split('T')[0];
                         }
-                        return '';
+                    },
+
+                    calculateDurationFromDates() {
+                        if (this.rentalDate && this.returnDate) {
+                            const startDate = new Date(this.rentalDate);
+                            const endDate = new Date(this.returnDate);
+
+                            // Calculate difference in days
+                            const diffTime = endDate - startDate;
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                            // Duration minimal 1 hari (same day rental)
+                            this.duration = Math.max(1, diffDays + 1);
+                            this.updateCalculation();
+                        }
+                    },
+
+                    formatDisplayDate(dateString) {
+                        if (!dateString) return '';
+                        const date = new Date(dateString);
+                        return date.toLocaleDateString('id-ID', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
                     },
 
                     formatDateRange() {
                         if (this.rentalDate && this.duration > 0) {
                             const startDate = new Date(this.rentalDate);
                             const endDate = new Date(startDate);
-                            endDate.setDate(startDate.getDate() + parseInt(this.duration));
+                            endDate.setDate(startDate.getDate() + parseInt(this.duration - 1));
 
                             const formatOptions = {
-                                weekday: 'short',
-                                year: 'numeric',
+                                day: 'numeric',
                                 month: 'short',
-                                day: 'numeric'
+                                year: 'numeric'
                             };
                             return `${startDate.toLocaleDateString('id-ID', formatOptions)} - ${endDate.toLocaleDateString('id-ID', formatOptions)}`;
                         }
@@ -815,15 +884,11 @@
                         if (this.selectedDriver && this.sopirData[this.selectedDriver]) {
                             const driver = this.sopirData[this.selectedDriver];
                             return {
-                                name: driver.nama,
-                                phone: driver.telepon,
-                                experience: driver.pengalaman_tahun
+                                name: driver.nama
                             };
                         }
                         return {
-                            name: 'Self Drive',
-                            phone: '',
-                            experience: ''
+                            name: 'Tanpa Sopir'
                         };
                     },
 
@@ -836,6 +901,7 @@
                             this.selectedCar &&
                             this.selectedPricing &&
                             this.rentalDate &&
+                            this.returnDate &&
                             this.duration > 0;
 
                         // If driver is required, check if driver is selected
@@ -851,6 +917,20 @@
                             return 'Pilih sopir untuk melanjutkan - diperlukan untuk paket ini';
                         }
                         return '';
+                    },
+
+                    validateAvailability() {
+                        // Real-time availability checking
+                        if (this.selectedCar && this.rentalDate && this.returnDate) {
+                            console.log('Checking availability:', {
+                                car: this.selectedCar,
+                                from: this.rentalDate,
+                                to: this.returnDate,
+                                duration: this.duration
+                            });
+                            // Note: Backend will validate on submit with conflict checking
+                            // This could be enhanced with AJAX call to check availability in real-time
+                        }
                     }
                 }));
             });

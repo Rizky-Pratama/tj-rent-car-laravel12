@@ -20,17 +20,36 @@
             <!-- Left: Form Sections -->
             <div class="lg:col-span-2 space-y-6">
                 @if ($errors->any())
-                    <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                    <div
+                        class="p-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg shadow-lg mb-6 animate-shake">
+                        <div class="flex items-start space-x-3">
+                            <iconify-icon icon="heroicons:exclamation-triangle-20-solid"
+                                class="w-8 h-8 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0"></iconify-icon>
+                            <div class="flex-1">
+                                <h4 class="text-base font-bold text-red-800 dark:text-red-200 mb-3">
+                                    ⚠️ TERJADI KESALAHAN
+                                </h4>
+                                <ul class="space-y-2 text-sm text-red-700 dark:text-red-300">
+                                    @foreach ($errors->all() as $error)
+                                        <li class="flex items-start font-medium">
+                                            <span class="mr-2 font-bold">▶</span>
+                                            <span>{{ $error }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
                     </div>
+                    <script>
+                        // Alert untuk memastikan terlihat
+                        @foreach ($errors->all() as $error)
+                            alert('ERROR: {{ addslashes($error) }}');
+                            @break
+                        @endforeach
+                    </script>
                 @endif
                 <form action="{{ route('admin.transaksi.store') }}" method="POST" class="space-y-6">
                     @csrf
-
                     <!-- Step 1: Customer Selection -->
                     <div
                         class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -61,24 +80,12 @@
                                         class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
                                         <option value="">-- Pilih Pelanggan --</option>
                                         @foreach ($pelanggan as $item)
-                                            @if (in_array($item->id, $analytics['popular_customers']))
-                                                <option value="{{ $item->id }}" data-nama="{{ $item->nama }}"
-                                                    data-telepon="{{ $item->telepon }}" data-email="{{ $item->email }}"
-                                                    data-alamat="{{ $item->alamat }}" data-ktp="{{ $item->no_ktp }}"
-                                                    {{ old('pelanggan_id') == $item->id ? 'selected' : '' }}>
-                                                    ⭐ {{ $item->nama }} - {{ $item->telepon }} (Pelanggan Aktif)
-                                                </option>
-                                            @endif
-                                        @endforeach
-                                        @foreach ($pelanggan as $item)
-                                            @if (!in_array($item->id, $analytics['popular_customers']))
-                                                <option value="{{ $item->id }}" data-nama="{{ $item->nama }}"
-                                                    data-telepon="{{ $item->telepon }}" data-email="{{ $item->email }}"
-                                                    data-alamat="{{ $item->alamat }}" data-ktp="{{ $item->no_ktp }}"
-                                                    {{ old('pelanggan_id') == $item->id ? 'selected' : '' }}>
-                                                    {{ $item->nama }} - {{ $item->telepon }}
-                                                </option>
-                                            @endif
+                                            <option value="{{ $item->id }}" data-nama="{{ $item->nama }}"
+                                                data-telepon="{{ $item->telepon }}" data-email="{{ $item->email }}"
+                                                data-alamat="{{ $item->alamat }}" data-ktp="{{ $item->no_ktp }}"
+                                                {{ old('pelanggan_id') == $item->id ? 'selected' : '' }}>
+                                                {{ $item->nama }} - {{ $item->telepon }}
+                                            </option>
                                         @endforeach
                                     </select>
                                     <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -152,36 +159,50 @@
                                     class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
                                     <option value="">-- Pilih Mobil --</option>
                                     @foreach ($mobil as $item)
-                                        @if (in_array($item->id, $analytics['popular_cars']))
-                                            <option value="{{ $item->id }}" data-merk="{{ $item->merk }}"
-                                                data-model="{{ $item->model }}" data-plat="{{ $item->plat_nomor }}"
-                                                data-tahun="{{ $item->tahun }}" data-warna="{{ $item->warna }}"
-                                                data-kapasitas="{{ $item->kapasitas_penumpang }}"
-                                                data-transmisi="{{ $item->transmisi }}"
-                                                data-bahan-bakar="{{ $item->jenis_bahan_bakar }}"
-                                                {{ old('mobil_id') == $item->id ? 'selected' : '' }}>
-                                                ⭐ {{ $item->merk }} {{ $item->model }} - {{ $item->plat_nomor }}
-                                                (Populer)
-                                            </option>
-                                        @endif
-                                    @endforeach
-                                    @foreach ($mobil as $item)
-                                        @if (!in_array($item->id, $analytics['popular_cars']))
-                                            <option value="{{ $item->id }}" data-merk="{{ $item->merk }}"
-                                                data-model="{{ $item->model }}" data-plat="{{ $item->plat_nomor }}"
-                                                data-tahun="{{ $item->tahun }}" data-warna="{{ $item->warna }}"
-                                                data-kapasitas="{{ $item->kapasitas_penumpang }}"
-                                                data-transmisi="{{ $item->transmisi }}"
-                                                data-bahan-bakar="{{ $item->jenis_bahan_bakar }}"
-                                                {{ old('mobil_id') == $item->id ? 'selected' : '' }}>
-                                                {{ $item->merk }} {{ $item->model }} - {{ $item->plat_nomor }}
-                                            </option>
-                                        @endif
+                                        <option value="{{ $item->id }}" data-merk="{{ $item->merk }}"
+                                            data-model="{{ $item->model }}" data-plat="{{ $item->plat_nomor }}"
+                                            data-tahun="{{ $item->tahun }}" data-warna="{{ $item->warna }}"
+                                            data-kapasitas="{{ $item->kapasitas_penumpang }}"
+                                            data-transmisi="{{ $item->transmisi }}"
+                                            data-bahan-bakar="{{ $item->jenis_bahan_bakar }}"
+                                            data-status="{{ $item->status }}"
+                                            {{ in_array($item->status, ['nonaktif', 'perawatan']) ? 'disabled' : '' }}
+                                            {{ old('mobil_id') == $item->id ? 'selected' : '' }}>
+                                            {{ $item->merk }} {{ $item->model }} - {{ $item->plat_nomor }}
+                                            @if ($item->status === 'disewa')
+                                                (Sedang Disewa - Cek Ketersediaan)
+                                            @elseif($item->status === 'nonaktif')
+                                                (Nonaktif - Tidak Tersedia)
+                                            @elseif($item->status === 'perawatan')
+                                                (Perawatan - Tidak Tersedia)
+                                            @elseif($item->status === 'tersedia')
+                                                (Tersedia Sekarang)
+                                            @endif
+                                        </option>
                                     @endforeach
                                 </select>
                                 @error('mobil_id')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
+                            </div>
+
+                            <!-- Car Status Info -->
+                            <div x-show="selectedCar" x-transition
+                                class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
+                                <div class="flex items-start space-x-2">
+                                    <iconify-icon icon="heroicons:information-circle-20-solid"
+                                        class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5"></iconify-icon>
+                                    <div class="text-sm">
+                                        <p class="font-medium text-blue-800 dark:text-blue-200 mb-1">Informasi Ketersediaan
+                                        </p>
+                                        <p class="text-blue-700 dark:text-blue-300">
+                                            Sistem akan mengecek ketersediaan mobil berdasarkan tanggal sewa yang Anda
+                                            pilih.
+                                            Mobil yang sedang disewa saat ini masih bisa dibooking untuk tanggal yang
+                                            berbeda.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Car Info Preview -->
@@ -284,7 +305,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <!-- Rental Date -->
                             <div>
                                 <label for="tanggal_sewa"
@@ -295,8 +316,28 @@
                                     @change="updateCalculation(); validateAvailability()" required
                                     value="{{ old('tanggal_sewa', date('Y-m-d')) }}" min="{{ date('Y-m-d') }}"
                                     max="{{ date('Y-m-d', strtotime('+' . $settings['advance_booking_days'] . ' days')) }}"
-                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
+                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 border @error('tanggal_sewa') border-red-500 dark:border-red-500 @else border-gray-200 dark:border-gray-600 @enderror rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
                                 @error('tanggal_sewa')
+                                    <div
+                                        class="flex items-start space-x-2 mt-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                                        <iconify-icon icon="heroicons:exclamation-triangle-20-solid"
+                                            class="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5"></iconify-icon>
+                                        <p class="text-sm text-red-700 dark:text-red-300">{{ $message }}</p>
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <!-- Return Date -->
+                            <div>
+                                <label for="tanggal_kembali"
+                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    Tanggal Kembali <span class="text-red-500">*</span>
+                                </label>
+                                <input type="date" name="tanggal_kembali" id="tanggal_kembali" x-model="returnDate"
+                                    @change="calculateDurationFromDates()" required
+                                    :min="rentalDate || '{{ date('Y-m-d') }}'"
+                                    class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-colors duration-200">
+                                @error('tanggal_kembali')
                                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -328,7 +369,7 @@
                             </div>
 
                             <!-- Quick Duration Buttons -->
-                            <div class="md:col-span-2">
+                            <div class="md:col-span-3">
                                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Durasi Populer:</p>
                                 <div class="flex flex-wrap gap-2">
                                     <template x-for="day in [1, 3, 7, 14, 30]" :key="day">
@@ -342,16 +383,26 @@
                                 </div>
                             </div>
 
-                            <!-- Return Date Display -->
-                            <div class="md:col-span-2" x-show="rentalDate && duration">
-                                <div
-                                    class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                                    <div class="flex items-center space-x-2">
-                                        <iconify-icon icon="heroicons:calendar-20-solid"
-                                            class="w-5 h-5 text-blue-600 dark:text-blue-400"></iconify-icon>
-                                        <span class="text-sm text-blue-700 dark:text-blue-300">
-                                            <strong>Tanggal Kembali:</strong> <span x-text="getReturnDate()"></span>
-                                        </span>
+                            <!-- Rental Period Summary -->
+                            <div class="md:col-span-3" x-show="rentalDate && returnDate && duration">
+                                <div x-transition
+                                    class="p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                                        <div>
+                                            <span class="text-gray-600 dark:text-gray-400">Tanggal Sewa:</span>
+                                            <div class="font-semibold text-indigo-600 dark:text-indigo-400"
+                                                x-text="formatDisplayDate(rentalDate)"></div>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600 dark:text-gray-400">Tanggal Kembali:</span>
+                                            <div class="font-semibold text-indigo-600 dark:text-indigo-400"
+                                                x-text="formatDisplayDate(returnDate)"></div>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-600 dark:text-gray-400">Total Durasi:</span>
+                                            <div class="font-semibold text-indigo-600 dark:text-indigo-400"
+                                                x-text="duration + ' Hari'"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -396,7 +447,6 @@
                                     <label class="relative cursor-pointer">
                                         <input type="radio" name="sopir_id" value="{{ $item->id }}"
                                             x-model="selectedDriver" @change="updateCalculation()"
-                                            data-tarif="{{ $item->tarif_per_hari ?? 0 }}"
                                             {{ old('sopir_id') == $item->id ? 'checked' : '' }} :required="requiresDriver"
                                             class="sr-only peer">
                                         <div
@@ -673,6 +723,7 @@
                     selectedPricing: '{{ old('harga_sewa_id', '') }}',
                     selectedDriver: '{{ old('sopir_id', '') }}',
                     rentalDate: '{{ old('tanggal_sewa', date('Y-m-d')) }}',
+                    returnDate: '{{ old('tanggal_kembali', '') }}',
                     duration: {{ old('durasi_hari', $analytics['avg_duration']) }},
 
                     // Data Collections
@@ -682,9 +733,7 @@
 
                     // Calculation Variables
                     dailyCarRate: 0,
-                    dailyDriverRate: 0,
                     carRentalCost: 0,
-                    driverCost: 0,
                     totalCost: 0,
 
                     // Driver requirement check
@@ -705,6 +754,12 @@
                             this.updateCarInfo(this.selectedCar);
                             this.loadPricingOptions(this.selectedCar);
                         }
+
+                        // Calculate return date if not set
+                        if (this.rentalDate && !this.returnDate && this.duration > 0) {
+                            this.calculateReturnDate();
+                        }
+
                         if (this.selectedPricing && this.duration > 0) {
                             this.updateCalculation();
                         }
@@ -755,15 +810,18 @@
 
                     updateCalculation() {
                         this.dailyCarRate = 0;
-                        this.dailyDriverRate = 0;
                         this.carRentalCost = 0;
-                        this.driverCost = 0;
                         this.totalCost = 0;
+
+                        // Calculate return date when duration or rental date changes
+                        if (this.rentalDate && this.duration > 0) {
+                            this.calculateReturnDate();
+                        }
 
                         // Check driver requirement first
                         this.checkDriverRequirement();
 
-                        // Calculate car rental cost
+                        // Calculate car rental cost (tanpa biaya sopir)
                         if (this.selectedPricing && this.duration > 0) {
                             const pricing = this.pricingOptions.find(p => p.id == this.selectedPricing);
                             if (pricing) {
@@ -772,16 +830,8 @@
                             }
                         }
 
-                        // Calculate driver cost
-                        if (this.selectedDriver && this.duration > 0) {
-                            const driver = this.sopirData[this.selectedDriver];
-                            if (driver && driver.tarif_per_hari) {
-                                this.dailyDriverRate = driver.tarif_per_hari;
-                                this.driverCost = this.dailyDriverRate * this.duration;
-                            }
-                        }
-
-                        this.totalCost = this.carRentalCost + this.driverCost;
+                        // Total = Car Rental only (no driver cost)
+                        this.totalCost = this.carRentalCost;
                     },
 
                     checkDriverRequirement() {
@@ -810,29 +860,51 @@
 
                     setDuration(days) {
                         this.duration = days;
+                        this.calculateReturnDate();
                         this.updateCalculation();
                     },
 
-                    getReturnDate() {
+                    calculateReturnDate() {
                         if (this.rentalDate && this.duration > 0) {
                             const startDate = new Date(this.rentalDate);
                             const returnDate = new Date(startDate);
-                            returnDate.setDate(startDate.getDate() + parseInt(this.duration));
-                            return returnDate.toLocaleDateString('id-ID', {
-                                weekday: 'long',
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric'
-                            });
+                            // Duration 1 hari = kembali hari yang sama
+                            returnDate.setDate(startDate.getDate() + parseInt(this.duration - 1));
+                            this.returnDate = returnDate.toISOString().split('T')[0];
                         }
-                        return '';
+                    },
+
+                    calculateDurationFromDates() {
+                        if (this.rentalDate && this.returnDate) {
+                            const startDate = new Date(this.rentalDate);
+                            const endDate = new Date(this.returnDate);
+
+                            // Calculate difference in days
+                            const diffTime = endDate - startDate;
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                            // Duration minimal 1 hari (same day rental)
+                            this.duration = Math.max(1, diffDays + 1);
+                            this.updateCalculation();
+                        }
+                    },
+
+                    formatDisplayDate(dateString) {
+                        if (!dateString) return '';
+                        const date = new Date(dateString);
+                        return date.toLocaleDateString('id-ID', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
                     },
 
                     formatDateRange() {
                         if (this.rentalDate && this.duration > 0) {
                             const startDate = new Date(this.rentalDate);
                             const endDate = new Date(startDate);
-                            endDate.setDate(startDate.getDate() + parseInt(this.duration));
+                            endDate.setDate(startDate.getDate() + parseInt(this.duration - 1));
 
                             const formatOptions = {
                                 day: 'numeric',
@@ -848,13 +920,11 @@
                         if (this.selectedDriver && this.sopirData[this.selectedDriver]) {
                             const driver = this.sopirData[this.selectedDriver];
                             return {
-                                name: driver.nama,
-                                rate: `Rp ${new Intl.NumberFormat('id-ID').format(driver.tarif_per_hari || 0)}/hari`
+                                name: driver.nama
                             };
                         }
                         return {
-                            name: 'Tanpa Sopir',
-                            rate: 'Gratis'
+                            name: 'Tanpa Sopir'
                         };
                     },
 
@@ -867,6 +937,7 @@
                             this.selectedCar &&
                             this.selectedPricing &&
                             this.rentalDate &&
+                            this.returnDate &&
                             this.duration > 0;
 
                         // If driver is required, check if driver is selected
@@ -885,9 +956,17 @@
                     },
 
                     validateAvailability() {
-                        // TODO: Add AJAX call to check car availability
-                        console.log('Validating availability for:', this.selectedCar, this.rentalDate, this
-                            .duration);
+                        // Real-time availability checking
+                        if (this.selectedCar && this.rentalDate && this.returnDate) {
+                            console.log('Checking availability:', {
+                                car: this.selectedCar,
+                                from: this.rentalDate,
+                                to: this.returnDate,
+                                duration: this.duration
+                            });
+                            // Note: Backend will validate on submit with conflict checking
+                            // This could be enhanced with AJAX call to check availability in real-time
+                        }
                     }
                 }));
             });

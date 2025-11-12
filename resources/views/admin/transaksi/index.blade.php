@@ -6,6 +6,14 @@
 
 @section('content')
 
+    @if ($errors->any())
+        <div class="mb-6">
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                <strong class="font-bold">Oops!</strong>
+                <span class="block sm:inline">{{ $errors->first() }}</span>
+            </div>
+        </div>
+    @endif
     <!-- Stats Cards -->
     <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
         <!-- Total -->
@@ -580,7 +588,7 @@
                                                             @method('PATCH')
                                                             <input type="hidden" name="status" value="dibayar">
                                                             <button type="submit"
-                                                                class="block w-full text-left px-4 py-2 text-sm text-green-700 dark:text-green-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                                class="w-full flex items-center text-left px-4 py-2 text-sm text-green-700 dark:text-green-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                                                                 onclick="return confirm('Konfirmasi bahwa pembayaran telah diterima?')">
                                                                 <iconify-icon icon="heroicons:credit-card-20-solid"
                                                                     class="w-4 h-4 mr-2 inline"></iconify-icon>
@@ -593,9 +601,9 @@
                                                             method="POST" class="block">
                                                             @csrf
                                                             @method('PATCH')
-                                                            <input type="hidden" name="status" value="dibatalkan">
+                                                            <input type="hidden" name="status" value="batal">
                                                             <button type="submit"
-                                                                class="block w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                                class="flex items-center w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                                                                 onclick="return confirm('Yakin ingin membatalkan transaksi ini?')">
                                                                 <iconify-icon icon="heroicons:x-circle-20-solid"
                                                                     class="w-4 h-4 mr-2 inline"></iconify-icon>
@@ -610,7 +618,7 @@
                                                             @method('PATCH')
                                                             <input type="hidden" name="status" value="berjalan">
                                                             <button type="submit"
-                                                                class="block w-full text-left px-4 py-2 text-sm text-green-700 dark:text-green-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                                class="flex items-center w-full text-left px-4 py-2 text-sm text-green-700 dark:text-green-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                                                                 onclick="return confirm('Mulai periode sewa?')">
                                                                 <iconify-icon icon="heroicons:truck-20-solid"
                                                                     class="w-4 h-4 mr-2 inline"></iconify-icon>
@@ -625,7 +633,7 @@
                                                             @method('PATCH')
                                                             <input type="hidden" name="status" value="selesai">
                                                             <button type="submit"
-                                                                class="block w-full text-left px-4 py-2 text-sm text-blue-700 dark:text-blue-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                                class="flex items-center w-full text-left px-4 py-2 text-sm text-blue-700 dark:text-blue-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                                                                 onclick="return confirm('Konfirmasi mobil telah dikembalikan?')">
                                                                 <iconify-icon icon="heroicons:check-circle-20-solid"
                                                                     class="w-4 h-4 mr-2 inline"></iconify-icon>
