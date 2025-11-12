@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -9,6 +8,10 @@
 @source inline("text-{red,blue,green,yellow,purple,orange,pink,amber}-500");
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+    --font-sans: "Inter", sans-serif;
+}
 
 iconify-icon {
     display: flex;
