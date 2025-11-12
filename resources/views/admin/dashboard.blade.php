@@ -4,6 +4,10 @@
 @section('page-title', 'Dashboard')
 @section('page-subtitle', 'Selamat datang! Berikut adalah ringkasan bisnis rental mobil Anda.')
 
+@push('styles')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@endpush
+
 @section('content')
 
     <x-admin.breadcrumb :breadcrumbs="[['title' => 'Dashboard', 'url' => route('admin.dashboard')]]" />

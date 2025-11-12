@@ -85,42 +85,42 @@
 
         /* Dark Mode Support */
         /* @media (prefers-color-scheme: dark) {
-                                .scheduler_default_main {
-                                    background: #1e293b;
-                                    border-color: #334155;
-                                }
+                                    .scheduler_default_main {
+                                        background: #1e293b;
+                                        border-color: #334155;
+                                    }
 
-                                .scheduler_default_rowheader {
-                                    background: #334155 !important;
-                                    color: #f1f5f9;
-                                    border-color: #475569 !important;
-                                }
+                                    .scheduler_default_rowheader {
+                                        background: #334155 !important;
+                                        color: #f1f5f9;
+                                        border-color: #475569 !important;
+                                    }
 
-                                .scheduler_default_corner {
-                                    background: #475569 !important;
-                                    border-color: #64748b !important;
-                                    color: #cbd5e1;
-                                }
+                                    .scheduler_default_corner {
+                                        background: #475569 !important;
+                                        border-color: #64748b !important;
+                                        color: #cbd5e1;
+                                    }
 
-                                .scheduler_default_colheader {
-                                    background: #475569 !important;
-                                    color: #f1f5f9;
-                                    border-color: #64748b !important;
-                                }
+                                    .scheduler_default_colheader {
+                                        background: #475569 !important;
+                                        color: #f1f5f9;
+                                        border-color: #64748b !important;
+                                    }
 
-                                .scheduler_default_cell {
-                                    border-color: #475569 !important;
-                                    background: #1e293b !important;
-                                }
+                                    .scheduler_default_cell {
+                                        border-color: #475569 !important;
+                                        background: #1e293b !important;
+                                    }
 
-                                .scheduler_default_cell.scheduler_default_cell_business {
-                                    background: #1e293b !important;
-                                }
+                                    .scheduler_default_cell.scheduler_default_cell_business {
+                                        background: #1e293b !important;
+                                    }
 
-                                .scheduler_default_cell_weekend {
-                                    background: #0f172a !important;
-                                }
-                            } */
+                                    .scheduler_default_cell_weekend {
+                                        background: #0f172a !important;
+                                    }
+                                } */
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -150,6 +150,7 @@
             color: white !important;
         }
     </style>
+    <script src="/js/daypilot-all.min.js"></script>
 @endpush
 
 @section('content')
