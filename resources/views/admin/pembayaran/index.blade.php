@@ -10,7 +10,7 @@
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-8">
         <!-- Total -->
         <div
-            class="flex items-centerbg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+            class="flex items-center bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <div class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
@@ -27,7 +27,7 @@
 
         <!-- Pending -->
         <div
-            class="flex items-centerbg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+            class="flex items-center bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
@@ -44,7 +44,7 @@
 
         <!-- Terkonfirmasi -->
         <div
-            class="flex items-centerbg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+            class="flex items-center bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <div class="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
@@ -61,7 +61,7 @@
 
         <!-- Gagal -->
         <div
-            class="flex items-centerbg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+            class="flex items-center bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <div class="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
@@ -78,7 +78,7 @@
 
         <!-- Refund -->
         <div
-            class="flex items-centerbg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+            class="flex items-center bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
@@ -95,7 +95,7 @@
 
         <!-- Total Nilai -->
         <div
-            class="flex items-centerbg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
+            class="flex items-center bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-4">
             <div class="flex items-center">
                 <div class="flex-shrink-0">
                     <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
@@ -403,31 +403,36 @@
                                             <iconify-icon icon="heroicons:pencil-20-solid" class="w-4 h-4"></iconify-icon>
                                         </a>
                                     @endif
+                                    @if ($item->status == 'pending')
+                                        <!-- Quick Actions Dropdown -->
+                                        <div class="relative inline-block text-left" x-data="{ open: false }"
+                                            @click.away="open = false">
+                                            <button type="button"
+                                                class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
+                                                @click="open = !open" title="Aksi Lainnya">
+                                                <iconify-icon icon="heroicons:ellipsis-vertical-20-solid"
+                                                    class="w-4 h-4"></iconify-icon>
+                                            </button>
 
-                                    <!-- Quick Actions Dropdown -->
-                                    <div class="relative inline-block text-left">
-                                        <button type="button"
-                                            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
-                                            onclick="toggleDropdown('dropdown-{{ $item->id }}')"
-                                            title="Aksi Lainnya">
-                                            <iconify-icon icon="heroicons:ellipsis-vertical-20-solid"
-                                                class="w-4 h-4"></iconify-icon>
-                                        </button>
-
-                                        <div id="dropdown-{{ $item->id }}"
-                                            class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                            <div class="py-1">
-                                                @if ($item->status == 'pending')
+                                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="transform opacity-0 scale-95"
+                                                x-transition:enter-end="transform opacity-100 scale-100"
+                                                x-transition:leave="transition ease-in duration-75"
+                                                x-transition:leave-start="transform opacity-100 scale-100"
+                                                x-transition:leave-end="transform opacity-0 scale-95"
+                                                class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black/5 focus:outline-none"
+                                                @click.away="open = false">
+                                                <div class="py-1">
                                                     <form action="{{ route('admin.pembayaran.updateStatus', $item->id) }}"
                                                         method="POST" class="block">
                                                         @csrf
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="terkonfirmasi">
                                                         <button type="submit"
-                                                            class="block w-full text-left px-4 py-2 text-sm text-green-700 dark:text-green-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                            class="flex items-center w-full text-left px-4 py-2 text-sm text-green-700 dark:text-green-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                                                             onclick="return confirm('Konfirmasi pembayaran ini?')">
                                                             <iconify-icon icon="heroicons:check-circle-20-solid"
-                                                                class="w-4 h-4 mr-2 inline"></iconify-icon>
+                                                                class="w-4 h-4 mr-2"></iconify-icon>
                                                             Konfirmasi
                                                         </button>
                                                     </form>
@@ -438,17 +443,17 @@
                                                         @method('PATCH')
                                                         <input type="hidden" name="status" value="gagal">
                                                         <button type="submit"
-                                                            class="block w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                            class="flex items-center w-full text-left px-4 py-2 text-sm text-red-700 dark:text-red-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                                                             onclick="return confirm('Tandai pembayaran sebagai gagal?')">
                                                             <iconify-icon icon="heroicons:x-circle-20-solid"
-                                                                class="w-4 h-4 mr-2 inline"></iconify-icon>
+                                                                class="w-4 h-4 mr-2"></iconify-icon>
                                                             Gagal
                                                         </button>
                                                     </form>
-                                                @endif
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -491,31 +496,4 @@
             </div>
         @endif
     </div>
-
-    <!-- JavaScript untuk dropdown functionality -->
-    <script>
-        function toggleDropdown(dropdownId) {
-            const dropdown = document.getElementById(dropdownId);
-            const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
-
-            // Close all other dropdowns
-            allDropdowns.forEach(d => {
-                if (d.id !== dropdownId) {
-                    d.classList.add('hidden');
-                }
-            });
-
-            // Toggle current dropdown
-            dropdown.classList.toggle('hidden');
-        }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('[onclick^="toggleDropdown"]')) {
-                document.querySelectorAll('[id^="dropdown-"]').forEach(dropdown => {
-                    dropdown.classList.add('hidden');
-                });
-            }
-        });
-    </script>
 @endsection

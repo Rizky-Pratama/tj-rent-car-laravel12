@@ -22,6 +22,11 @@ class PembayaranController extends Controller
             'date_to' => $request->date_to,
         ];
 
+        // Set default period ke this month jika tidak ada filter
+        if (empty($filters['period']) && empty($filters['date_from'])) {
+            $filters['period'] = 'this_month';
+        }
+
         $pembayaran = Pembayaran::with(['transaksi.pelanggan', 'transaksi.mobil', 'dibuatOleh'])
             ->filter($filters)
             ->latest()
@@ -63,6 +68,7 @@ class PembayaranController extends Controller
             'transaksi_id' => 'required|exists:transaksi,id',
             'jumlah' => 'required|numeric|min:1',
             'metode' => 'required|in:transfer,tunai,qris,kartu,ewallet',
+            'status' => 'required|in:pending,terkonfirmasi',
             'tanggal_bayar' => 'required|date',
             'bukti_bayar' => 'nullable|image|max:2048',
             'catatan' => 'nullable|string|max:1000',
@@ -78,8 +84,7 @@ class PembayaranController extends Controller
                 return back()->withErrors(['jumlah' => 'Jumlah pembayaran melebihi sisa tagihan (Rp ' . number_format($sisaTagihan, 0, ',', '.') . ')'])->withInput();
             }
 
-            $data = $request->only(['transaksi_id', 'jumlah', 'metode', 'tanggal_bayar', 'catatan']);
-            $data['status'] = 'terkonfirmasi'; // Langsung konfirmasi untuk pembayaran manual
+            $data = $request->only(['transaksi_id', 'jumlah', 'metode', 'status', 'tanggal_bayar', 'catatan']);
             $data['dibuat_oleh'] = auth()->id();
 
             // Handle file upload
@@ -96,7 +101,6 @@ class PembayaranController extends Controller
 
             return redirect()->route('admin.pembayaran.show', $pembayaran)
                 ->with('success', 'Pembayaran berhasil ditambahkan');
-
         } catch (\Exception $e) {
             DB::rollback();
             return back()->withErrors(['error' => 'Gagal menambahkan pembayaran: ' . $e->getMessage()])->withInput();
@@ -143,7 +147,6 @@ class PembayaranController extends Controller
 
             return redirect()->route('admin.pembayaran.show', $pembayaran)
                 ->with('success', 'Pembayaran berhasil diupdate');
-
         } catch (\Exception $e) {
             DB::rollback();
             return back()->withErrors(['error' => 'Gagal mengupdate pembayaran: ' . $e->getMessage()])->withInput();
@@ -168,7 +171,6 @@ class PembayaranController extends Controller
             DB::commit();
 
             return back()->with('success', 'Status pembayaran berhasil diupdate');
-
         } catch (\Exception $e) {
             DB::rollback();
             return back()->withErrors(['error' => 'Gagal mengupdate status pembayaran: ' . $e->getMessage()]);
@@ -195,7 +197,6 @@ class PembayaranController extends Controller
 
             return redirect()->route('admin.pembayaran.index')
                 ->with('success', 'Pembayaran berhasil dihapus');
-
         } catch (\Exception $e) {
             DB::rollback();
             return back()->withErrors(['error' => 'Gagal menghapus pembayaran: ' . $e->getMessage()]);

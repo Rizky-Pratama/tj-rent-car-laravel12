@@ -71,7 +71,7 @@
                                 <div class="flex justify-between border-t border-blue-200 dark:border-blue-700 pt-2">
                                     <span class="text-gray-600 dark:text-gray-400">Sisa Tagihan:</span>
                                     <span class="font-bold text-red-600 dark:text-red-400">Rp
-                                        {{ number_format($pembayaran->transaksi->sisa_pembayaran + $pembayaran->jumlah, 0, ',', '.') }}</span>
+                                        {{ number_format($pembayaran->transaksi->sisa_pembayaran, 0, ',', '.') }}</span>
                                 </div>
                             </div>
                         </div>
@@ -101,15 +101,14 @@
                             Jumlah Pembayaran *
                         </label>
                         <input type="number" name="jumlah" id="jumlah" value="{{ old('jumlah', $pembayaran->jumlah) }}"
-                            max="{{ $pembayaran->transaksi->sisa_pembayaran + $pembayaran->jumlah }}" min="1"
-                            step="1000" required
+                            max="{{ $pembayaran->transaksi->sisa_pembayaran }}" min="1000" step="1000" required
                             class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                         @error('jumlah')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                             Maksimal: Rp
-                            {{ number_format($pembayaran->transaksi->sisa_pembayaran + $pembayaran->jumlah, 0, ',', '.') }}
+                            {{ number_format($pembayaran->transaksi->sisa_pembayaran, 0, ',', '.') }}
                         </p>
                     </div>
 
