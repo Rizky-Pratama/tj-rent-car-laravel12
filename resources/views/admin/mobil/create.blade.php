@@ -223,8 +223,7 @@
                         <div>
                             <label for="foto"
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Foto Mobil</label>
-                            <input type="file" name="foto" id="foto" accept="image/*"
-                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <input type="file" name="foto" id="foto" accept="image/*" class="filepond">
                             @error('foto')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror

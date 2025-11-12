@@ -212,6 +212,10 @@
                                 <img src="{{ asset('storage/' . $mobil->foto) }}"
                                     alt="{{ $mobil->merk }} {{ $mobil->model }}"
                                     class="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600">
+                                <a href="{{ asset('storage/' . $mobil->foto) }}" target="_blank"
+                                    rel="noopener noreferrer" class="text-indigo-600 hover:underline text-sm">
+                                    Lihat Gambar Penuh
+                                </a>
                             </div>
                         @endif
 
@@ -219,12 +223,13 @@
                         <div>
                             <label for="foto"
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ $mobil->foto ? 'Ubah Foto' : 'Foto Mobil' }}</label>
-                            <input type="file" name="foto" id="foto" accept="image/*"
-                                class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            <input type="file" name="foto" id="foto" accept="image/*" class="filepond"
+                                data-max-file-size="2MB" data-max-files="1">
                             @error('foto')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
-                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Maksimal ukuran file: 2MB. Format yang
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Maksimal ukuran file: 2MB. Format
+                                yang
                                 didukung: JPG, PNG</p>
                         </div>
                     </div>

@@ -45,3 +45,7 @@ iconify-icon {
 .dark ::-webkit-scrollbar-thumb:hover {
     background: #64748b;
 }
+
+.filepond--credits {
+    display: none;
+}

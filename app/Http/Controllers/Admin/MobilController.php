@@ -18,12 +18,12 @@ class MobilController extends Controller
 
         // Search functionality
         if ($search = $request->get('search')) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nama_mobil', 'like', "%{$search}%")
-                  ->orWhere('merk', 'like', "%{$search}%")
-                  ->orWhere('model', 'like', "%{$search}%")
-                  ->orWhere('plat_nomor', 'like', "%{$search}%")
-                  ->orWhere('warna', 'like', "%{$search}%");
+                    ->orWhere('merk', 'like', "%{$search}%")
+                    ->orWhere('model', 'like', "%{$search}%")
+                    ->orWhere('plat_nomor', 'like', "%{$search}%")
+                    ->orWhere('warna', 'like', "%{$search}%");
             });
         }
 
@@ -121,8 +121,8 @@ class MobilController extends Controller
         // Handle file upload
         if ($request->hasFile('foto')) {
             // Delete old photo if exists
-            if ($mobil->foto && \Storage::disk('public')->exists($mobil->foto)) {
-                \Storage::disk('public')->delete($mobil->foto);
+            if ($mobil->foto && Storage::disk('public')->exists($mobil->foto)) {
+                Storage::disk('public')->delete($mobil->foto);
             }
             $validated['foto'] = $request->file('foto')->store('mobil', 'public');
         }
