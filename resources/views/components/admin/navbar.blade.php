@@ -20,8 +20,9 @@
         <div class="flex items-center space-x-3">
 
             <!-- Dark mode toggle -->
-            <button @click="darkMode = !darkMode"
-                class="p-2.5 rounded-xl flex items-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200">
+            <button @click="toggleTheme()"
+                class="p-2.5 rounded-xl flex items-center text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                title="Toggle Dark Mode">
                 <iconify-icon x-show="!darkMode" icon="heroicons:moon-20-solid" class="w-5 h-5"></iconify-icon>
                 <iconify-icon x-show="darkMode" icon="heroicons:sun-20-solid" class="w-5 h-5"
                     style="display: none;"></iconify-icon>

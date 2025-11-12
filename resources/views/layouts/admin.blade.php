@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ darkMode: false }" x-bind:class="{ 'dark': darkMode }">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
@@ -8,28 +8,40 @@
 
     <title>@yield('title', 'Admin Dashboard') - TJ Rent Car</title>
 
+    <script>
+        (function() {
+            'use strict';
+            const theme = localStorage.getItem('theme');
+            const root = document.documentElement;
+            if (theme === 'dark') {
+                root.classList.add('dark');
+            } else if (theme === 'light') {
+                root.classList.remove('dark');
+            } else {
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    root.classList.add('dark');
+                }
+            }
+        })();
+    </script>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Iconify Icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
 
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Assets (includes theme.js for Alpine integration) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     @livewireScripts()
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- DayPilot Lite -->
-    <script src="/js/daypilot-all.min.js"></script>
 
     @stack('styles')
 </head>
 
-<body class="font-sans antialiased bg-gray-50 dark:bg-gray-900" x-data="{ sidebarOpen: false }">
+<body class="font-sans antialiased bg-gray-50 dark:bg-gray-900" x-data="themeManager()" x-init="initTheme()">
     <div class="min-h-screen flex">
         <!-- Sidebar -->
         <x-admin.sidebar />

@@ -1,4 +1,5 @@
 import "./bootstrap";
+import "./theme"; // Theme Manager for Dark Mode
 import * as FilePond from "filepond";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginImageCrop from "filepond-plugin-image-crop";
