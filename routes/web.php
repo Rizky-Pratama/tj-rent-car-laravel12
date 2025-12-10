@@ -35,6 +35,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Mobil Management
     Route::resource('mobil', MobilController::class);
+    Route::get('mobil-export/pdf', [MobilController::class, 'exportPdf'])->name('mobil.export.pdf');
 
     // Sopir Management
     Route::resource('sopir', SopirController::class);
@@ -58,13 +59,17 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/jadwal/transaksi/{id}', [JadwalController::class, 'show'])->name('jadwal.show');
 
     // Transaksi Management (All-in-One)
-    Route::resource('transaksi', TransaksiController::class);
+    // IMPORTANT: Specific routes MUST come before resource routes to avoid conflicts
+    Route::get('/transaksi/search', [TransaksiController::class, 'searchForPayment'])->name('transaksi.search');
+    Route::get('/transaksi/{transaksi}/export-pdf', [TransaksiController::class, 'exportDetailPdf'])->name('transaksi.export-pdf');
+    Route::get('/transaksi/{transaksi}/payment', [TransaksiController::class, 'payment'])->name('transaksi.payment');
     Route::patch('/transaksi/{transaksi}/status', [TransaksiController::class, 'updateStatus'])->name('transaksi.update-status');
     Route::post('/transaksi/{transaksi}/biaya-tambahan', [TransaksiController::class, 'addBiayaTambahan'])->name('transaksi.add-biaya');
     Route::post('/transaksi/{transaksi}/denda', [TransaksiController::class, 'addDenda'])->name('transaksi.add-denda');
-    Route::get('/transaksi/{transaksi}/payment', [TransaksiController::class, 'payment'])->name('transaksi.payment');
+    Route::resource('transaksi', TransaksiController::class);
 
     // Pembayaran Management
+    Route::get('pembayaran-export/pdf', [PembayaranController::class, 'exportPdf'])->name('pembayaran.export.pdf');
     Route::resource('pembayaran', PembayaranController::class)->except(['edit', 'update']);
     Route::get('/pembayaran/{pembayaran}/edit', [PembayaranController::class, 'edit'])->name('pembayaran.edit');
     Route::put('/pembayaran/{pembayaran}', [PembayaranController::class, 'update'])->name('pembayaran.update');
@@ -84,4 +89,3 @@ Route::prefix('api/v1')->name('api.')->group(function () {
     // Mobil endpoints
     Route::get('/mobil', [ApiMobilController::class, 'index'])->name('mobil.index');
 });
-
