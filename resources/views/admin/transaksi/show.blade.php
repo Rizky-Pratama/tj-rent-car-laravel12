@@ -4,6 +4,13 @@
 @section('page-title', 'Detail Transaksi')
 @section('page-subtitle', 'Informasi lengkap transaksi rental mobil')
 
+@push('styles')
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+@endpush
 @section('content')
     <div class="max-w-7xl mx-auto">
         <!-- Back Button -->
@@ -21,17 +28,10 @@
                 <div>
                     <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ $transaksi->no_transaksi }}</h1>
                     <p class="text-sm text-gray-600 dark:text-gray-400">
-                        {{ $transaksi->created_at->format('d M Y, H:i') }}
+                        {{ $transaksi->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }}
                     </p>
                 </div>
                 <div class="flex items-center space-x-2">
-                    @if ($transaksi->status == 'pending')
-                        <a href="{{ route('admin.transaksi.edit', $transaksi->id) }}"
-                            class="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
-                            <iconify-icon icon="heroicons:pencil-20-solid" class="w-4 h-4 mr-1"></iconify-icon>
-                            Edit
-                        </a>
-                    @endif
                     <!-- Status Badge -->
                     @if ($transaksi->status === 'pending')
                         <span
@@ -70,6 +70,22 @@
                             <iconify-icon icon="heroicons:x-circle-20-solid" class="w-3 h-3 mr-1"></iconify-icon>
                             Dibatalkan
                         </span>
+                    @endif
+
+                    <!-- Export PDF Button -->
+                    <a href="{{ route('admin.transaksi.export-pdf', $transaksi->id) }}"
+                        class="inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors duration-200"
+                        target="_blank">
+                        <iconify-icon icon="heroicons:document-arrow-down-20-solid" class="w-4 h-4 mr-1"></iconify-icon>
+                        Cetak Invoice
+                    </a>
+
+                    @if ($transaksi->status == 'pending')
+                        <a href="{{ route('admin.transaksi.edit', $transaksi->id) }}"
+                            class="inline-flex items-center px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                            <iconify-icon icon="heroicons:pencil-20-solid" class="w-4 h-4 mr-1"></iconify-icon>
+                            Edit
+                        </a>
                     @endif
                 </div>
             </div>
@@ -317,7 +333,7 @@
                                     @foreach ($transaksi->pembayaran as $bayar)
                                         <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
                                             <td class="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                                {{ $bayar->created_at->format('d/m/Y H:i') }}
+                                                {{ $bayar->created_at->timezone('Asia/Jakarta')->format('d M Y, H:i') }}
                                             </td>
                                             <td class="px-4 py-3 text-sm font-medium text-gray-900 dark:text-white">
                                                 Rp {{ number_format($bayar->jumlah, 0, ',', '.') }}

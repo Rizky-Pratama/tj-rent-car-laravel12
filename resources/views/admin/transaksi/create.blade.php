@@ -19,35 +19,6 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" x-data="transactionForm()">
             <!-- Left: Form Sections -->
             <div class="lg:col-span-2 space-y-6">
-                @if ($errors->any())
-                    <div
-                        class="p-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg shadow-lg mb-6 animate-shake">
-                        <div class="flex items-start space-x-3">
-                            <iconify-icon icon="heroicons:exclamation-triangle-20-solid"
-                                class="w-8 h-8 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0"></iconify-icon>
-                            <div class="flex-1">
-                                <h4 class="text-base font-bold text-red-800 dark:text-red-200 mb-3">
-                                    ⚠️ TERJADI KESALAHAN
-                                </h4>
-                                <ul class="space-y-2 text-sm text-red-700 dark:text-red-300">
-                                    @foreach ($errors->all() as $error)
-                                        <li class="flex items-start font-medium">
-                                            <span class="mr-2 font-bold">▶</span>
-                                            <span>{{ $error }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <script>
-                        // Alert untuk memastikan terlihat
-                        @foreach ($errors->all() as $error)
-                            alert('ERROR: {{ addslashes($error) }}');
-                            @break
-                        @endforeach
-                    </script>
-                @endif
                 <form action="{{ route('admin.transaksi.store') }}" method="POST" class="space-y-6">
                     @csrf
                     <!-- Step 1: Customer Selection -->
@@ -552,7 +523,7 @@
 
             <!-- Right: Live Summary Sidebar -->
             <div class="lg:col-span-1">
-                <div class="sticky top-0 space-y-6">
+                <div class="sticky top-6 space-y-6">
                     <!-- Live Calculation Card -->
                     <div
                         class="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl border border-indigo-200 dark:border-indigo-800 p-6">

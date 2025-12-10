@@ -207,11 +207,11 @@ class Transaksi extends Model
                     break;
                 case 'this_month':
                     $query->whereMonth('created_at', Carbon::now()->month)
-                          ->whereYear('created_at', Carbon::now()->year);
+                        ->whereYear('created_at', Carbon::now()->year);
                     break;
                 case 'last_month':
                     $query->whereMonth('created_at', Carbon::now()->subMonth()->month)
-                          ->whereYear('created_at', Carbon::now()->subMonth()->year);
+                        ->whereYear('created_at', Carbon::now()->subMonth()->year);
                     break;
                 case 'this_year':
                     $query->whereYear('created_at', Carbon::now()->year);
@@ -279,16 +279,16 @@ class Transaksi extends Model
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('no_transaksi', 'like', "%{$search}%")
-                  ->orWhereHas('pelanggan', function ($q) use ($search) {
-                      $q->where('nama', 'like', "%{$search}%")
-                        ->orWhere('telepon', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('mobil', function ($q) use ($search) {
-                      $q->where('merek', 'like', "%{$search}%")
-                        ->orWhere('model', 'like', "%{$search}%")
-                        ->orWhere('no_plat', 'like', "%{$search}%");
-                  });
+                    ->orWhereHas('pelanggan', function ($q) use ($search) {
+                        $q->where('nama', 'like', "%{$search}%")
+                            ->orWhere('telepon', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('mobil', function ($q) use ($search) {
+                        $q->where('merk', 'like', "%{$search}%")
+                            ->orWhere('model', 'like', "%{$search}%")
+                            ->orWhere('plat_nomor', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -300,7 +300,7 @@ class Transaksi extends Model
     {
         $today = now()->toDateString();
 
-        return match($this->status) {
+        return match ($this->status) {
             'dibayar' => [
                 'status' => 'dibayar',
                 'color' => 'bg-blue-500',
@@ -342,13 +342,13 @@ class Transaksi extends Model
     public function isOverdue()
     {
         return $this->status === 'telat' ||
-               ($this->status === 'berjalan' && $this->tanggal_kembali->isPast());
+            ($this->status === 'berjalan' && $this->tanggal_kembali->isPast());
     }
 
     // Scope untuk kalender
     public function scopeForCalendar($query)
     {
         return $query->whereIn('status', ['dibayar', 'berjalan', 'telat'])
-                    ->with(['mobil', 'pelanggan', 'hargaSewa.jenisSewa']);
+            ->with(['mobil', 'pelanggan', 'hargaSewa.jenisSewa']);
     }
 }

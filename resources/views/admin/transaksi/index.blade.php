@@ -335,74 +335,13 @@
                     </p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <!-- Export Button with Alpine.js -->
-                    <div x-data="{
-                        isExporting: false,
-                        showExportOptions: false,
-                        async exportPDF() {
-                            this.isExporting = true;
-                            try {
-                                const currentUrl = new URL(window.location.href);
-                                const params = new URLSearchParams(currentUrl.search);
-                                params.set('export', 'pdf');
-                    
-                                // Create a form for POST request or use window.open for GET request
-                                const exportUrl = `${currentUrl.pathname}?${params.toString()}`;
-                    
-                                // Use window.open to trigger PDF download
-                                const downloadWindow = window.open(exportUrl, '_blank');
-                    
-                                // Close the popup window after a short delay
-                                setTimeout(() => {
-                                    if (downloadWindow) {
-                                        downloadWindow.close();
-                                    }
-                                }, 3000);
-                    
-                            } catch (error) {
-                                alert('Gagal mengekspor data. Silakan coba lagi.');
-                                console.error('Export error:', error);
-                            } finally {
-                                this.isExporting = false;
-                                this.showExportOptions = false;
-                            }
-                        }
-                    }" class="relative">
-                        <!-- Export Dropdown Button -->
-                        <button @click="showExportOptions = !showExportOptions" :disabled="isExporting"
-                            class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white text-sm font-medium rounded-xl transition-colors duration-200">
-                            <iconify-icon x-show="!isExporting" icon="heroicons:arrow-down-tray-20-solid"
-                                class="w-4 h-4 mr-2"></iconify-icon>
-                            <div x-show="isExporting"
-                                class="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin">
-                            </div>
-                            <span x-text="isExporting ? 'Mengekspor...' : 'Export'"></span>
-                            <iconify-icon icon="heroicons:chevron-down-20-solid" class="w-4 h-4 ml-1"></iconify-icon>
-                        </button>
-
-                        <!-- Export Options Dropdown -->
-                        <div x-show="showExportOptions" @click.away="showExportOptions = false"
-                            x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-10">
-                            <div class="py-2">
-                                <button @click="exportPDF()" :disabled="isExporting"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50">
-                                    <iconify-icon icon="heroicons:document-arrow-down-20-solid"
-                                        class="w-4 h-4 mr-3 text-red-500"></iconify-icon>
-                                    Export ke PDF
-                                </button>
-                                <button @click="alert('Fitur Excel akan segera tersedia')"
-                                    class="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-                                    <iconify-icon icon="heroicons:table-cells-20-solid"
-                                        class="w-4 h-4 mr-3 text-green-500"></iconify-icon>
-                                    Export ke Excel
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Export PDF Button -->
+                    <a href="{{ route('admin.transaksi.index', array_merge(request()->query(), ['export' => 'pdf'])) }}"
+                        class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-xl transition-colors duration-200"
+                        target="_blank">
+                        <iconify-icon icon="heroicons:document-arrow-down-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
+                        Export PDF
+                    </a>
 
                     <a href="{{ route('admin.transaksi.create') }}"
                         class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition-colors duration-200">
@@ -457,7 +396,7 @@
                                             {{ $item->no_transaksi }}
                                         </div>
                                         <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $item->created_at->format('d M Y, H:i') }}
+                                            {{ $item->created_at->timeZone('Asia/Jakarta')->format('d M Y, H:i') }}
                                         </div>
                                     </div>
                                 </div>
@@ -568,17 +507,22 @@
 
                                     @if (!in_array($item->status, ['selesai', 'batal']))
                                         <!-- Quick Actions Dropdown -->
-                                        <div class="relative inline-block text-left">
-                                            <button type="button"
+                                        <div x-data="{ open: false }" @click.away="open = false"
+                                            class="relative inline-block text-left">
+                                            <button type="button" @click="open = !open"
                                                 class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 focus:outline-none"
-                                                onclick="toggleDropdown('dropdown-{{ $item->id }}')"
                                                 title="Aksi Lainnya">
                                                 <iconify-icon icon="heroicons:ellipsis-vertical-20-solid"
                                                     class="w-4 h-4"></iconify-icon>
                                             </button>
 
-                                            <div id="dropdown-{{ $item->id }}"
-                                                class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-700 shadow-lg focus:outline-none">
+                                            <div x-show="open" x-transition:enter="transition ease-out duration-100"
+                                                x-transition:enter-start="opacity-0 scale-95"
+                                                x-transition:enter-end="opacity-100 scale-100"
+                                                x-transition:leave="transition ease-in duration-75"
+                                                x-transition:leave-start="opacity-100 scale-100"
+                                                x-transition:leave-end="opacity-0 scale-95"
+                                                class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 shadow-lg focus:outline-none">
                                                 <div class="py-1">
                                                     @if ($item->status == 'pending')
                                                         <form
@@ -687,31 +631,4 @@
             </div>
         @endif
     </div>
-
-    <!-- JavaScript untuk dropdown functionality -->
-    <script>
-        function toggleDropdown(dropdownId) {
-            const dropdown = document.getElementById(dropdownId);
-            const allDropdowns = document.querySelectorAll('[id^="dropdown-"]');
-
-            // Close all other dropdowns
-            allDropdowns.forEach(d => {
-                if (d.id !== dropdownId) {
-                    d.classList.add('hidden');
-                }
-            });
-
-            // Toggle current dropdown
-            dropdown.classList.toggle('hidden');
-        }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('[onclick^="toggleDropdown"]')) {
-                document.querySelectorAll('[id^="dropdown-"]').forEach(dropdown => {
-                    dropdown.classList.add('hidden');
-                });
-            }
-        });
-    </script>
 @endsection

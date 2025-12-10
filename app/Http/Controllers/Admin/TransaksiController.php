@@ -338,6 +338,24 @@ class TransaksiController extends Controller
         return view('admin.transaksi.show', compact('transaksi'));
     }
 
+    /**
+     * Export detail transaksi to PDF
+     */
+    public function exportDetailPdf($id)
+    {
+        $transaksi = Transaksi::with(['pelanggan', 'mobil', 'hargaSewa.jenisSewa', 'sopir', 'pembayaran'])
+            ->findOrFail($id);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.transaksi.detail-pdf', [
+            'transaksi' => $transaksi,
+            'generated_at' => now(),
+        ]);
+
+        $pdf->setPaper('A4', 'portrait');
+
+        return $pdf->download($transaksi->no_transaksi . '-' . now()->timezone('Asia/Jakarta')->isoFormat('D-MM-Y-HH-mm-ss') . '.pdf');
+    }
+
     public function edit($id)
     {
         $transaksi = Transaksi::with(['pelanggan', 'mobil', 'hargaSewa.jenisSewa', 'sopir'])->findOrFail($id);
@@ -776,35 +794,76 @@ class TransaksiController extends Controller
         return view('admin.transaksi.payment', compact('transaksi'));
     }
 
+    public function searchForPayment(Request $request)
+    {
+        $query = $request->get('q', '');
+
+        // Get transaksi with status_pembayaran not 'lunas'
+        // We can't filter by sisa_pembayaran in DB because it's an accessor
+        $transaksi = Transaksi::with(['pelanggan', 'mobil', 'pembayaran' => function ($q) {
+            $q->where('status', 'terkonfirmasi');
+        }])
+            ->where('status_pembayaran', '!=', 'lunas')
+            ->where(function ($q) use ($query) {
+                if (!empty($query)) {
+                    $q->where('no_transaksi', 'like', "%{$query}%")
+                        ->orWhereHas('pelanggan', function ($q2) use ($query) {
+                            $q2->where('nama', 'like', "%{$query}%");
+                        });
+                }
+            })
+            ->orderBy('created_at', 'desc')
+            ->limit(20)
+            ->get()
+            ->filter(function ($t) {
+                // Additional filter: only show if actually has remaining payment
+                return $t->sisa_pembayaran > 0;
+            })
+            ->take(10) // Limit final results
+            ->map(function ($t) {
+                // Explicitly add computed properties to JSON response
+                return [
+                    'id' => $t->id,
+                    'no_transaksi' => $t->no_transaksi,
+                    'status' => $t->status,
+                    'status_pembayaran' => $t->status_pembayaran,
+                    'total' => $t->total,
+                    'total_pembayaran' => $t->total_pembayaran, // Accessor
+                    'sisa_pembayaran' => $t->sisa_pembayaran,   // Accessor
+                    'pelanggan' => [
+                        'id' => $t->pelanggan->id,
+                        'nama' => $t->pelanggan->nama,
+                    ],
+                    'mobil' => [
+                        'id' => $t->mobil->id,
+                        'merk' => $t->mobil->merk,
+                        'model' => $t->mobil->model,
+                        'plat_nomor' => $t->mobil->plat_nomor,
+                    ],
+                ];
+            })
+            ->values(); // Re-index array
+
+        return response()->json([
+            'transaksi' => $transaksi
+        ]);
+    }
+
     public function exportPDF(Request $request)
     {
         try {
             $transaksi = $this->getFilteredTransaksi($request);
-            $filters = $request->only([
-                'period',
-                'date_from',
-                'date_to',
-                'status',
-                'payment_status',
-                'mobil_id',
-                'sopir_id',
-                'jenis_sewa',
-                'min_total',
-                'max_total',
-                'search'
-            ]);
             $statistik = $this->getStatistik($request);
 
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.transaksi.pdf-export', [
                 'transaksi' => $transaksi,
-                'filters' => $filters,
                 'statistik' => $statistik,
-                'generated_at' => now()
+                'generated_at' => now()->timezone('Asia/Jakarta')->locale('id')->isoFormat('D MMMM Y HH:mm:ss'),
             ]);
 
             $pdf->setPaper('a4', 'landscape');
 
-            $filename = 'laporan-transaksi-' . now()->format('Y-m-d-H-i-s') . '.pdf';
+            $filename = 'laporan-transaksi-' . now()->timezone('Asia/Jakarta')->isoFormat('D-MM-Y-HH-mm-ss') . '.pdf';
 
             return $pdf->download($filename);
         } catch (\Exception $e) {
@@ -835,6 +894,10 @@ class TransaksiController extends Controller
             'search'
         ]);
 
+        if (empty($filters['period']) && empty($filters['date_from'])) {
+            $filters['period'] = 'this_month';
+        }
+
         return Transaksi::with(['pelanggan', 'mobil', 'hargaSewa.jenisSewa', 'sopir'])
             ->filter($filters)
             ->orderBy('created_at', 'desc')
@@ -856,6 +919,10 @@ class TransaksiController extends Controller
             'max_total',
             'search'
         ]);
+
+        if (empty($filters['period']) && empty($filters['date_from'])) {
+            $filters['period'] = 'this_month';
+        }
 
         return [
             'total' => Transaksi::filter($filters)->count(),
