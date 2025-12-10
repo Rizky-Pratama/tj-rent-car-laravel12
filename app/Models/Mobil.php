@@ -56,6 +56,26 @@ class Mobil extends Model
         return $query->where('status', '!=', 'nonaktif');
     }
 
+    /**
+     * Scope untuk menerapkan semua filter sekaligus
+     */
+    public function scopeFilter($query, array $filters)
+    {
+        return $query
+            ->when($filters['search'] ?? null, function ($q, $search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('nama_mobil', 'like', "%{$search}%")
+                        ->orWhere('merk', 'like', "%{$search}%")
+                        ->orWhere('model', 'like', "%{$search}%")
+                        ->orWhere('plat_nomor', 'like', "%{$search}%")
+                        ->orWhere('warna', 'like', "%{$search}%");
+                });
+            })
+            ->when($filters['status'] ?? null, fn($q, $status) => $q->where('status', $status))
+            ->when($filters['brand'] ?? null, fn($q, $brand) => $q->where('merk', $brand))
+            ->when($filters['transmisi'] ?? null, fn($q, $transmisi) => $q->where('transmisi', $transmisi));
+    }
+
     // Mutators
     public function setNamaMobilAttribute($value)
     {

@@ -14,35 +14,10 @@ class MobilController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Mobil::query();
-
-        // Search functionality
-        if ($search = $request->get('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama_mobil', 'like', "%{$search}%")
-                    ->orWhere('merk', 'like', "%{$search}%")
-                    ->orWhere('model', 'like', "%{$search}%")
-                    ->orWhere('plat_nomor', 'like', "%{$search}%")
-                    ->orWhere('warna', 'like', "%{$search}%");
-            });
-        }
-
-        // Filter by status
-        if ($status = $request->get('status')) {
-            $query->where('status', $status);
-        }
-
-        // Filter by brand
-        if ($brand = $request->get('brand')) {
-            $query->where('merk', $brand);
-        }
-
-        // Filter by transmission
-        if ($transmisi = $request->get('transmisi')) {
-            $query->where('transmisi', $transmisi);
-        }
-
-        $mobils = $query->with(['hargaSewa.jenisSewa'])->orderBy('created_at', 'desc')->paginate(10);
+        $mobils = Mobil::filter($request->only(['search', 'status', 'brand', 'transmisi']))
+            ->with(['hargaSewa.jenisSewa'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         // Get brands for filter dropdown
         $brands = Mobil::distinct('merk')->orderBy('merk')->pluck('merk');
@@ -277,5 +252,24 @@ class MobilController extends Controller
 
         return redirect()->route('admin.mobil.pricing', $mobil)
             ->with('success', 'Harga sewa berhasil dihapus!');
+    }
+
+    /**
+     * Export data mobil to PDF
+     */
+    public function exportPdf(Request $request)
+    {
+        $mobil = Mobil::filter($request->only(['search', 'status', 'brand', 'transmisi']))
+            ->orderBy('nama_mobil', 'asc')
+            ->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('admin.mobil.pdf-export', [
+            'mobil' => $mobil,
+            'generated_at' => now()->timezone('Asia/Jakarta')->locale('id')->isoFormat('D MMMM Y HH:mm:ss'),
+        ]);
+
+        $pdf->setPaper('A4', 'landscape');
+
+        return $pdf->download('laporan-data-mobil-' . now()->timezone('Asia/Jakarta')->isoFormat('D-MM-Y-HH-mm-ss') . '.pdf');
     }
 }
