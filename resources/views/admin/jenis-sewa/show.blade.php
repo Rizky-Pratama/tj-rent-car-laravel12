@@ -184,7 +184,7 @@
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="text-sm font-semibold text-gray-900 dark:text-white">
-                                                        Rp {{ number_format($harga->harga, 0, ',', '.') }}
+                                                        Rp {{ number_format($harga->harga_per_hari, 0, ',', '.') }}
                                                     </div>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
