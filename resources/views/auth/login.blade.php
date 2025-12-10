@@ -4,139 +4,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - TJ Rent Car Admin</title>
+    <title>Login - TJ Rent Car</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+
+    <script>
+        // Dark mode initialization (same as admin layout)
+        (function() {
+            'use strict';
+            const theme = localStorage.getItem('theme');
+            const root = document.documentElement;
+            if (theme === 'dark') {
+                root.classList.add('dark');
+            } else if (theme === 'light') {
+                root.classList.remove('dark');
+            } else {
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    root.classList.add('dark');
+                }
+            }
+        })();
+    </script>
 
     @livewireScripts()
 </head>
 
-<body
-    class="h-full bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900">
-    <!-- Background Pattern -->
-    <div class="absolute inset-0 overflow-hidden">
-        <svg class="absolute left-[max(50%,25rem)] top-0 h-[64rem] w-[128rem] -translate-x-1/2 stroke-gray-200 dark:stroke-gray-700 [mask-image:radial-gradient(64rem_64rem_at_top,white,transparent)]"
-            aria-hidden="true">
-            <defs>
-                <pattern id="e813992c-7d03-4cc4-a2bd-151760b470a0" width="200" height="200" x="50%" y="-1"
-                    patternUnits="userSpaceOnUse">
-                    <path d="M100 200V.5M.5 .5H200" fill="none" />
-                </pattern>
-            </defs>
-            <rect width="100%" height="100%" stroke-width="0" fill="url(#e813992c-7d03-4cc4-a2bd-151760b470a0)" />
-        </svg>
-    </div>
-
-    <div class="relative min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-md w-full space-y-8">
-            <!-- Header -->
-            <div class="text-center">
-                <div class="flex justify-center">
-                    <div class="w-46 h-46 flex items-center justify-center">
-                        {{-- <iconify-icon icon="heroicons:bolt-solid" class="w-10 h-10 text-white"></iconify-icon> --}}
-                        <img src="/logo/logo.png" alt="Logo">
+<body class="h-full bg-gray-50 dark:bg-gray-900">
+    <div class="min-h-screen flex">
+        <!-- Left Side - Form (Mobile: Full width, Desktop: 50%) -->
+        <div class="flex-1 flex flex-col justify-center py-8 px-4 sm:px-6 lg:px-20 xl:px-24">
+            <div class="mx-auto w-full max-w-sm lg:w-96">
+                <!-- Logo & Title -->
+                <div class="mb-8 text-center lg:text-start">
+                    <div class="flex items-center justify-center lg:justify-start mb-1">
+                        <img src="/logo/logo.png" alt="TJ Rent Car" class="h-32 w-auto">
                     </div>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        Selamat Datang
+                    </h2>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        Masuk ke sistem manajemen rental mobil
+                    </p>
                 </div>
-                <h2 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    Selamat Datang
-                </h2>
-                <div class="mt-2 flex items-center justify-center space-x-2">
-                    <h3 class="text-xl font-semibold text-indigo-600 dark:text-indigo-400">TJ Rent Car</h3>
-                </div>
-                <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Masuk ke sistem manajemen rental mobil
-                </p>
-            </div>
 
-            <!-- Login Form -->
-            <div
-                class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
-                <form class="space-y-6" action="#" method="POST">
+                <!-- Login Form -->
+                <form class="space-y-5" action="#" method="POST">
                     @csrf
-                    <div class="space-y-5">
-                        <!-- Email Field -->
-                        <div>
-                            <label for="email"
-                                class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                Alamat Email
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <iconify-icon icon="heroicons:envelope-20-solid"
-                                        class="h-5 w-5 text-gray-400 dark:text-gray-500"></iconify-icon>
-                                </div>
-                                <input id="email" name="email" type="email" required
-                                    class="block w-full pl-11 pr-4 py-3.5 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                                    placeholder="admin@tjrentcar.com" value="{{ old('email') }}">
-                            </div>
-                            @error('email')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                            @enderror
-                        </div>
 
-                        <!-- Password Field -->
-                        <div>
-                            <label for="password"
-                                class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                                Kata Sandi
-                            </label>
-                            <div class="relative" x-data="{ showPassword: false }">
-                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                    <iconify-icon icon="heroicons:lock-closed-20-solid"
-                                        class="h-5 w-5 text-gray-400 dark:text-gray-500"></iconify-icon>
-                                </div>
-                                <input id="password" name="password" :type="showPassword ? 'text' : 'password'"
-                                    required
-                                    class="block w-full pl-11 pr-11 py-3.5 border border-gray-200 dark:border-gray-600 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                                    placeholder="Masukkan kata sandi Anda">
-                                <div class="absolute inset-y-0 right-0 pr-4 flex items-center">
-                                    <button type="button" @click="showPassword = !showPassword"
-                                        class="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 transition-colors duration-200">
-                                        <iconify-icon x-show="!showPassword" icon="heroicons:eye-20-solid"
-                                            class="h-5 w-5"></iconify-icon>
-                                        <iconify-icon x-show="showPassword" icon="heroicons:eye-slash-20-solid"
-                                            class="h-5 w-5"></iconify-icon>
-                                    </button>
-                                </div>
+                    <!-- Email Field -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Alamat Email
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <iconify-icon icon="heroicons:envelope-solid"
+                                    class="h-5 w-5 text-gray-400"></iconify-icon>
                             </div>
-                            @error('password')
-                                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
-                            @enderror
+                            <input id="email" name="email" type="email" required
+                                class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors text-sm"
+                                placeholder="admin@admin.com" value="{{ old('email') }}">
                         </div>
+                        @error('email')
+                            <p class="mt-1.5 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
 
-                        <!-- Remember Me & Forgot Password -->
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input id="remember-me" name="remember" type="checkbox"
-                                    class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700">
-                                <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                                    Ingat saya
-                                </label>
+                    <!-- Password Field -->
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Kata Sandi
+                        </label>
+                        <div class="relative" x-data="{ showPassword: false }">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <iconify-icon icon="heroicons:lock-closed-solid"
+                                    class="h-5 w-5 text-gray-400"></iconify-icon>
                             </div>
+                            <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required
+                                class="block w-full pl-10 pr-10 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors text-sm"
+                                placeholder="••••••••">
+                            <button type="button" @click="showPassword = !showPassword"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                <iconify-icon x-show="!showPassword" icon="heroicons:eye-solid"
+                                    class="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"></iconify-icon>
+                                <iconify-icon x-show="showPassword" icon="heroicons:eye-slash-solid"
+                                    class="h-5 w-5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"></iconify-icon>
+                            </button>
                         </div>
+                        @error('password')
+                            <p class="mt-1.5 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <!-- Remember Me -->
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember" type="checkbox"
+                            class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                            Ingat saya
+                        </label>
                     </div>
 
                     <!-- Submit Button -->
-                    <div class="pt-2">
-                        <button type="submit"
-                            class="group relative w-full flex justify-center items-center py-3.5 px-4 border border-transparent text-sm font-semibold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200">
-                            <iconify-icon icon="heroicons:arrow-right-20-solid" class="mr-2 h-5 w-5"></iconify-icon>
-                            Masuk ke Dashboard
-                        </button>
-                    </div>
+                    <button type="submit"
+                        class="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900 transition-colors">
+                        <iconify-icon icon="heroicons:arrow-right-solid" class="mr-2 h-4 w-4"></iconify-icon>
+                        Masuk ke Dashboard
+                    </button>
                 </form>
-            </div>
 
-            <!-- Footer -->
-            <div class="text-center mt-8">
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                    © {{ date('Y') }} TJ Rent Car. Semua hak dilindungi.
-                </p>
-                <div class="flex items-center justify-center mt-2 space-x-4 text-xs text-gray-400 dark:text-gray-500">
-                    <span class="flex items-center">
-                        <iconify-icon icon="heroicons:shield-check-20-solid" class="w-3 h-3 mr-1"></iconify-icon>
+                <!-- Footer -->
+                <div class="mt-8">
+                    <p class="text-xs text-center text-gray-500 dark:text-gray-400">
+                        © {{ date('Y') }} TJ Rent Car. Semua hak dilindungi.
+                    </p>
+                    <p
+                        class="mt-2 text-xs text-center text-gray-400 dark:text-gray-500 flex items-center justify-center">
+                        <iconify-icon icon="heroicons:heart-solid" class="w-3 h-3 mr-1 text-red-500"></iconify-icon>
                         Aman & Terpercaya
-                    </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Hero Image (Hidden on mobile, visible on lg+) -->
+        <div class="hidden lg:block relative w-0 flex-1">
+            <div class="absolute inset-0 bg-gray-100 dark:bg-gray-800">
+                <!-- Subtle Pattern Overlay -->
+                <div class="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+                    style="background-image: radial-gradient(circle at 1px 1px, rgb(0 0 0) 1px, transparent 0); background-size: 40px 40px;">
+                </div>
+
+                <!-- Content -->
+                <div class="relative h-full flex flex-col items-center justify-center p-12">
+                    <div class="max-w-md text-center">
+
+                        <h3 class="text-3xl font-bold mb-4 text-gray-900 dark:text-white">
+                            Sistem Manajemen Rental Mobil
+                        </h3>
+                        <p class="text-base text-gray-600 dark:text-gray-400 mb-8">
+                            Kelola bisnis rental mobil Anda dengan mudah dan efisien
+                        </p>
+
+                        <!-- Features -->
+                        <div class="space-y-4 text-left">
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex-shrink-0 w-6 h-6 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mt-0.5">
+                                    <iconify-icon icon="heroicons:check-solid"
+                                        class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></iconify-icon>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Manajemen Transaksi</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Memudahkan pengelolaan transaksi
+                                        rental mobil Anda</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex-shrink-0 w-6 h-6 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mt-0.5">
+                                    <iconify-icon icon="heroicons:check-solid"
+                                        class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></iconify-icon>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Laporan Lengkap</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Export laporan pembayaran dan
+                                        transaksi</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div
+                                    class="flex-shrink-0 w-6 h-6 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mt-0.5">
+                                    <iconify-icon icon="heroicons:check-solid"
+                                        class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></iconify-icon>
+                                </div>
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Dashboard Interaktif</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Visualisasi data dengan grafik
+                                        dan statistik</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
