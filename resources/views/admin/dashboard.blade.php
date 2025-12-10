@@ -137,10 +137,10 @@
     <!-- Recent Transactions -->
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
         <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Transaksi Terbaru</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Transaksi rental terbaru</p>
+            <div class="flex flex-col md:flex-row items-center gap-2 justify-between">
+                <div class="text-center md:text-left">
+                    <h3 class="lg:text-lg font-semibold text-gray-800 dark:text-white">Transaksi Terbaru</h3>
+                    <p class="text-sm lg:text-base text-gray-500 dark:text-gray-400">Transaksi rental terbaru</p>
                 </div>
                 <a href="{{ route('admin.transaksi.index') }}"
                     class="px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/50 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/70 transition-colors duration-200">
@@ -149,7 +149,7 @@
             </div>
         </div>
 
-        <div class="overflow-hidden">
+        <div class="overflow-x-auto">
             <table class="w-full">
                 <thead class="bg-gray-50 dark:bg-gray-700/50">
                     <tr>
