@@ -100,9 +100,44 @@
                         <label for="jumlah" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Jumlah Pembayaran *
                         </label>
-                        <input type="number" name="jumlah" id="jumlah" value="{{ old('jumlah', $pembayaran->jumlah) }}"
-                            max="{{ $pembayaran->transaksi->sisa_pembayaran }}" min="1000" step="1000" required
-                            class="w-full px-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        <div class="relative">
+                            <div
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 pointer-events-none">
+                                Rp
+                            </div>
+                            <input type="text" name="jumlah" id="jumlah"
+                                value="{{ old('jumlah') ? old('jumlah') : number_format($pembayaran->jumlah, 0, ',', '.') }}"
+                                data-max="{{ $pembayaran->transaksi->sisa_pembayaran }}" placeholder="0" required
+                                class="w-full pl-12 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                        </div>
+
+                        <!-- Quick Action Buttons -->
+                        <div class="mt-2 flex flex-wrap gap-2" x-data="paymentInput()">
+                            <button type="button" @click="setPercentage(25)"
+                                class="quick-payment-btn px-3 py-1 text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
+                                25%
+                            </button>
+                            <button type="button" @click="setPercentage(50)"
+                                class="quick-payment-btn px-3 py-1 text-xs font-medium bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors">
+                                50%
+                            </button>
+                            <button type="button" @click="setPercentage(75)"
+                                class="quick-payment-btn px-3 py-1 text-xs font-medium bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors">
+                                75%
+                            </button>
+                            <button type="button" @click="setPercentage(100)"
+                                class="quick-payment-btn px-3 py-1 text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors border border-green-200 dark:border-green-800">
+                                <iconify-icon icon="heroicons:check-circle-solid"
+                                    class="inline text-sm mr-1"></iconify-icon>
+                                Lunas
+                            </button>
+                            <button type="button" @click="clearAmount()"
+                                class="px-3 py-1 text-xs font-medium bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+                                <iconify-icon icon="heroicons:x-mark-solid" class="inline text-sm"></iconify-icon>
+                                Reset
+                            </button>
+                        </div>
+
                         @error('jumlah')
                             <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ $message }}</p>
                         @enderror
@@ -151,7 +186,8 @@
                                 Terkonfirmasi</option>
                             <option value="gagal" {{ old('status', $pembayaran->status) === 'gagal' ? 'selected' : '' }}>
                                 Gagal</option>
-                            <option value="refund" {{ old('status', $pembayaran->status) === 'refund' ? 'selected' : '' }}>
+                            <option value="refund"
+                                {{ old('status', $pembayaran->status) === 'refund' ? 'selected' : '' }}>
                                 Refund</option>
                         </select>
                         @error('status')
@@ -161,7 +197,8 @@
 
                     <!-- Tanggal Pembayaran -->
                     <div>
-                        <label for="tanggal_bayar" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label for="tanggal_bayar"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             Tanggal Pembayaran *
                         </label>
                         <input type="datetime-local" name="tanggal_bayar" id="tanggal_bayar"
@@ -236,15 +273,119 @@
 
     @push('scripts')
         <script>
-            // Auto format currency input
-            document.getElementById('jumlah').addEventListener('input', function(e) {
-                let value = e.target.value.replace(/[^\d]/g, '');
-                if (value) {
-                    // Update the placeholder or helper text to show formatted value
-                    const formatted = 'Rp ' + parseInt(value).toLocaleString('id-ID');
-                    console.log('Formatted:', formatted);
+            // Alpine.js Component: Payment Input with Currency Formatting
+            function paymentInput() {
+                return {
+                    rawValue: '',
+                    showWarning: false,
+                    warningTimeout: null,
+
+                    init() {
+                        const input = this.$el.previousElementSibling.querySelector('#jumlah');
+                        if (!input) return;
+
+                        // Handle input event
+                        input.addEventListener('input', (e) => this.handleInput(e));
+
+                        // Handle blur event
+                        input.addEventListener('blur', (e) => this.handleBlur(e));
+
+                        // Handle form submit
+                        const form = input.closest('form');
+                        if (form) {
+                            form.addEventListener('submit', (e) => this.handleSubmit(e, input));
+                        }
+                    },
+
+                    handleInput(e) {
+                        let value = e.target.value.replace(/\D/g, '');
+
+                        if (value) {
+                            const numValue = parseInt(value);
+                            const maxValue = parseInt(e.target.getAttribute('data-max') || 0);
+
+                            // Validate against max value
+                            if (maxValue > 0 && numValue > maxValue) {
+                                value = maxValue.toString();
+                                this.displayWarning(e.target);
+                            }
+
+                            // Format with thousands separator
+                            e.target.value = parseInt(value).toLocaleString('id-ID');
+                            this.rawValue = value;
+                        } else {
+                            e.target.value = '';
+                            this.rawValue = '';
+                        }
+                    },
+
+                    handleBlur(e) {
+                        let value = e.target.value.replace(/\D/g, '');
+                        if (value && value !== '0') {
+                            e.target.value = parseInt(value).toLocaleString('id-ID');
+                        } else {
+                            e.target.value = '';
+                        }
+                    },
+
+                    handleSubmit(e, input) {
+                        const rawValue = input.value.replace(/\D/g, '');
+                        input.value = rawValue || '0';
+                    },
+
+                    displayWarning(inputElement) {
+                        // Clear existing timeout
+                        if (this.warningTimeout) {
+                            clearTimeout(this.warningTimeout);
+                        }
+
+                        // Remove existing warning
+                        const existingWarning = inputElement.parentElement.parentElement.querySelector('.max-warning');
+                        if (existingWarning) {
+                            existingWarning.remove();
+                        }
+
+                        // Create new warning
+                        const warnEl = document.createElement('p');
+                        warnEl.className = 'mt-1 text-xs text-orange-600 dark:text-orange-400 max-warning';
+                        warnEl.textContent = 'Jumlah melebihi sisa tagihan, disesuaikan ke maksimal';
+                        inputElement.parentElement.parentElement.appendChild(warnEl);
+
+                        // Auto-remove after 3 seconds
+                        this.warningTimeout = setTimeout(() => warnEl.remove(), 3000);
+                    },
+
+                    setPercentage(percentage) {
+                        const input = document.getElementById('jumlah');
+                        if (!input) return;
+
+                        const maxValue = parseInt(input.getAttribute('data-max') || 0);
+                        if (maxValue === 0) return;
+
+                        // Calculate amount
+                        const amount = Math.round(maxValue * (percentage / 100));
+
+                        // Set value and trigger formatting
+                        input.value = amount.toString();
+                        input.dispatchEvent(new Event('input'));
+
+                        // Visual feedback
+                        input.classList.add('ring-2', 'ring-green-500');
+                        setTimeout(() => {
+                            input.classList.remove('ring-2', 'ring-green-500');
+                        }, 500);
+                    },
+
+                    clearAmount() {
+                        const input = document.getElementById('jumlah');
+                        if (input) {
+                            input.value = '';
+                            this.rawValue = '';
+                            input.focus();
+                        }
+                    }
                 }
-            });
+            }
         </script>
     @endpush
 @endsection

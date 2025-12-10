@@ -82,11 +82,11 @@ class Pembayaran extends Model
                     break;
                 case 'this_month':
                     $query->whereMonth('created_at', \Carbon\Carbon::now()->month)
-                          ->whereYear('created_at', \Carbon\Carbon::now()->year);
+                        ->whereYear('created_at', \Carbon\Carbon::now()->year);
                     break;
                 case 'last_month':
                     $query->whereMonth('created_at', \Carbon\Carbon::now()->subMonth()->month)
-                          ->whereYear('created_at', \Carbon\Carbon::now()->subMonth()->year);
+                        ->whereYear('created_at', \Carbon\Carbon::now()->subMonth()->year);
                     break;
                 case 'this_year':
                     $query->whereYear('created_at', \Carbon\Carbon::now()->year);
@@ -115,12 +115,12 @@ class Pembayaran extends Model
         // Filter berdasarkan pencarian
         if (isset($filters['search']) && $filters['search']) {
             $search = '%' . $filters['search'] . '%';
-            $query->whereHas('transaksi', function($q) use ($search) {
+            $query->whereHas('transaksi', function ($q) use ($search) {
                 $q->where('no_transaksi', 'like', $search)
-                  ->orWhereHas('pelanggan', function($q2) use ($search) {
-                      $q2->where('nama', 'like', $search)
-                         ->orWhere('telepon', 'like', $search);
-                  });
+                    ->orWhereHas('pelanggan', function ($q2) use ($search) {
+                        $q2->where('nama', 'like', $search)
+                            ->orWhere('telepon', 'like', $search);
+                    });
             });
         }
 

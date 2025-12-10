@@ -267,8 +267,8 @@
                                                         {{ $transaksi->mobil->model ?? '' }}
                                                     </h4>
                                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                        {{ $transaksi->tanggal_mulai?->format('d M Y') }} -
-                                                        {{ $transaksi->tanggal_selesai?->format('d M Y') }}
+                                                        {{ $transaksi->tanggal_sewa?->format('d M Y') }} -
+                                                        {{ $transaksi->tanggal_kembali?->format('d M Y') }}
                                                     </p>
                                                 </div>
                                             </div>
@@ -290,7 +290,7 @@
                                                     </span>
                                                 @endif
                                                 <p class="text-sm font-semibold text-gray-900 dark:text-white mt-1">
-                                                    Rp {{ number_format($transaksi->total_harga, 0, ',', '.') }}
+                                                    Rp {{ number_format($transaksi->total, 0, ',', '.') }}
                                                 </p>
                                             </div>
                                         </div>

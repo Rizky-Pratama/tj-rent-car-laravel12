@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Pembayaran;
 use App\Models\Transaksi;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -216,5 +218,60 @@ class PembayaranController extends Controller
         }
 
         $transaksi->update(['status_pembayaran' => $statusPembayaran]);
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $filters = [
+            'search' => $request->search,
+            'status' => $request->status,
+            'metode' => $request->metode,
+            'period' => $request->period,
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+        ];
+
+        // Set default period ke this month jika tidak ada filter
+        if (empty($filters['period']) && empty($filters['date_from'])) {
+            $filters['period'] = 'this_month';
+        }
+
+        $pembayaran = Pembayaran::with(['transaksi.pelanggan', 'transaksi.mobil', 'dibuatOleh'])
+            ->filter($filters)
+            ->latest()
+            ->get();
+
+        $statistik = [
+            'total' => Pembayaran::filter($filters)->count(),
+            'pending' => Pembayaran::filter($filters)->where('status', 'pending')->count(),
+            'terkonfirmasi' => Pembayaran::filter($filters)->where('status', 'terkonfirmasi')->count(),
+            'gagal' => Pembayaran::filter($filters)->where('status', 'gagal')->count(),
+            'refund' => Pembayaran::filter($filters)->where('status', 'refund')->count(),
+            'total_nilai' => Pembayaran::filter($filters)->where('status', 'terkonfirmasi')->sum('jumlah'),
+        ];
+
+        // Generate filter label
+        $filterLabel = match ($filters['period'] ?? null) {
+            'today' => 'Hari Ini (' . Carbon::today()->format('d/m/Y') . ')',
+            'yesterday' => 'Kemarin (' . Carbon::yesterday()->format('d/m/Y') . ')',
+            'this_week' => 'Minggu Ini',
+            'this_month' => 'Bulan Ini (' . Carbon::now()->format('F Y') . ')',
+            'last_month' => 'Bulan Lalu (' . Carbon::now()->subMonth()->format('F Y') . ')',
+            'this_year' => 'Tahun Ini (' . Carbon::now()->format('Y') . ')',
+            'custom' => ($filters['date_from'] ?? '') . ' - ' . ($filters['date_to'] ?? ''),
+            default => 'Semua Waktu',
+        };
+
+        $pdf = Pdf::loadView('admin.pembayaran.pdf-export', [
+            'pembayaran' => $pembayaran,
+            'statistik' => $statistik,
+            'filters' => $filters,
+            'filter_label' => $filterLabel,
+            'generated_at' => Carbon::now(),
+        ]);
+
+        $pdf->setPaper('A4', 'landscape');
+
+        return $pdf->download('laporan-pembayaran-' . date('Y-m-d') . '.pdf');
     }
 }

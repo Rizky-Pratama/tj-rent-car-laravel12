@@ -280,11 +280,18 @@
                         @endif
                     </p>
                 </div>
-                <a href="{{ route('admin.pembayaran.create') }}"
-                    class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition-colors duration-200">
-                    <iconify-icon icon="heroicons:plus-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
-                    Tambah Pembayaran
-                </a>
+                <div class="flex gap-2">
+                    <a href="{{ route('admin.pembayaran.export.pdf', request()->query()) }}"
+                        class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-xl transition-colors duration-200">
+                        <iconify-icon icon="heroicons:document-arrow-down-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
+                        Export PDF
+                    </a>
+                    <a href="{{ route('admin.pembayaran.create') }}"
+                        class="inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-xl transition-colors duration-200">
+                        <iconify-icon icon="heroicons:plus-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
+                        Tambah Pembayaran
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -332,7 +339,7 @@
                                             {{ $item->transaksi->no_transaksi }}
                                         </div>
                                         <div class="text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $item->created_at->format('d M Y, H:i') }}
+                                            {{ $item->created_at->timeZone('Asia/Jakarta')->format('d M Y, H:i') }}
                                         </div>
                                     </div>
                                 </div>
