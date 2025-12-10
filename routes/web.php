@@ -65,8 +65,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/jadwal/events', [JadwalController::class, 'events'])->name('jadwal.events');
     Route::get('/jadwal/transaksi/{id}', [JadwalController::class, 'show'])->name('jadwal.show');
 
-    // Transaksi Management (All-in-One)
-    // IMPORTANT: Specific routes MUST come before resource routes to avoid conflicts
+    // Transaksi Management
     Route::get('/transaksi/search', [TransaksiController::class, 'searchForPayment'])->name('transaksi.search');
     Route::get('/transaksi/{transaksi}/export-pdf', [TransaksiController::class, 'exportDetailPdf'])->name('transaksi.export-pdf');
     Route::get('/transaksi/{transaksi}/payment', [TransaksiController::class, 'payment'])->name('transaksi.payment');
