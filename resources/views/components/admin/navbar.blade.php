@@ -34,8 +34,8 @@
                         src="https://ui-avatars.com/api/?name=Admin+User&color=7C3AED&background=EDE9FE&size=32"
                         alt="Avatar">
                     <div class="hidden md:block text-left">
-                        <div class="text-sm font-medium text-gray-700 dark:text-gray-200">Admin User</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">Administrator</div>
+                        <div class="text-sm font-medium text-gray-700 dark:text-gray-200">{{ Auth::user()->nama }}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">{{ ucfirst(Auth::user()->role) }}</div>
                     </div>
                     <iconify-icon icon="heroicons:chevron-down-20-solid"
                         class="w-4 h-4 text-gray-400 transition-transform duration-200"
@@ -52,7 +52,7 @@
                     <div class="py-2">
                         @auth
                             <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                                <p class="text-sm font-medium text-gray-800 dark:text-white">{{ Auth::user()->nama }}</p>
+                                <p class="text-sm font-medium text-gray-800 dark:text-white ">{{ Auth::user()->nama }}</p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()->email }}</p>
                                 <span
                                     class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">
@@ -60,16 +60,10 @@
                                 </span>
                             </div>
 
-                            <a href="#"
+                            <a href="{{ route('admin.profile.show') }}"
                                 class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150">
                                 <iconify-icon icon="heroicons:user-20-solid" class="w-4 h-4 mr-3"></iconify-icon>
                                 Profil Saya
-                            </a>
-
-                            <a href="#"
-                                class="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150">
-                                <iconify-icon icon="heroicons:cog-6-tooth-20-solid" class="w-4 h-4 mr-3"></iconify-icon>
-                                Pengaturan Akun
                             </a>
 
                             <hr class="my-2 border-gray-200 dark:border-gray-700">

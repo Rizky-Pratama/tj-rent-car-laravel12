@@ -66,11 +66,13 @@
             </div>
         </div>
 
-        <a href="{{ route('admin.users.create') }}"
-            class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-sm font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
-            <iconify-icon icon="heroicons:plus-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
-            Tambah Pengguna
-        </a>
+        @can('create', App\Models\User::class)
+            <a href="{{ route('admin.users.create') }}"
+                class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white text-sm font-medium rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl">
+                <iconify-icon icon="heroicons:plus-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
+                Tambah Pengguna
+            </a>
+        @endcan
     </div>
 
     <!-- Users Table -->
@@ -153,26 +155,29 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex items-center justify-end gap-2">
-                                    <a href="{{ route('admin.users.show', $user) }}"
-                                        class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
-                                        <iconify-icon icon="heroicons:eye-20-solid" class="w-4 h-4"></iconify-icon>
-                                    </a>
-                                    <a href="{{ route('admin.users.edit', $user) }}"
-                                        class="text-amber-600 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300">
-                                        <iconify-icon icon="heroicons:pencil-20-solid" class="w-4 h-4"></iconify-icon>
-                                    </a>
-                                    @if ($user->id !== auth()->id())
+                                    @can('view', $user)
+                                        <a href="{{ route('admin.users.show', $user) }}"
+                                            class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                                            <iconify-icon icon="heroicons:eye-20-solid" class="w-4 h-4"></iconify-icon>
+                                        </a>
+                                    @endcan
+                                    @can('update', $user)
+                                        <a href="{{ route('admin.users.edit', $user) }}"
+                                            class="text-amber-600 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-300">
+                                            <iconify-icon icon="heroicons:pencil-20-solid" class="w-4 h-4"></iconify-icon>
+                                        </a>
+                                    @endcan
+                                    @can('delete', $user)
                                         <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
                                             onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')" class="inline">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
                                                 class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                                                <iconify-icon icon="heroicons:trash-20-solid"
-                                                    class="w-4 h-4"></iconify-icon>
+                                                <iconify-icon icon="heroicons:trash-20-solid" class="w-4 h-4"></iconify-icon>
                                             </button>
                                         </form>
-                                    @endif
+                                    @endcan
                                 </div>
                             </td>
                         </tr>

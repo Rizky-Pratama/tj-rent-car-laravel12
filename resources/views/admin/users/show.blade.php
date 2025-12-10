@@ -36,11 +36,13 @@
                     </div>
                 </div>
                 <div class="flex gap-2">
-                    <a href="{{ route('admin.users.edit', $user) }}"
-                        class="inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-xl transition-colors duration-200">
-                        <iconify-icon icon="heroicons:pencil-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
-                        Edit
-                    </a>
+                    @can('update', $user)
+                        <a href="{{ route('admin.users.edit', $user) }}"
+                            class="inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-xl transition-colors duration-200">
+                            <iconify-icon icon="heroicons:pencil-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
+                            Edit
+                        </a>
+                    @endcan
                     <a href="{{ route('admin.users.index') }}"
                         class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-xl transition-colors duration-200">
                         <iconify-icon icon="heroicons:arrow-left-20-solid" class="w-4 h-4 mr-2"></iconify-icon>
