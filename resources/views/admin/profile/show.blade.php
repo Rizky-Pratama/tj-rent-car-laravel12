@@ -14,7 +14,7 @@
 
             <!-- Profile Content -->
             <div class="px-6 pb-6">
-                <div class="flex flex-col sm:flex-row items-start sm:items-end -mt-16 mb-6">
+                <div class="flex flex-col sm:flex-row items-start sm:items-end -mt-15 mb-6">
                     <!-- Avatar -->
                     <div class="relative mb-4 sm:mb-0">
                         <div
@@ -27,7 +27,7 @@
 
                     <!-- Name & Role -->
                     <div class="sm:ml-6 flex-1">
-                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">{{ $user->nama }}</h2>
+                        <h2 class="text-2xl font-bold text-gray-900 dark:text-white line-clamp-1">{{ $user->nama }}</h2>
                         <div class="flex items-center mt-2 space-x-3">
                             <span
                                 class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200">

@@ -42,19 +42,9 @@
         <!-- Revenue Chart -->
         <div
             class="lg:col-span-2 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Grafik Pendapatan</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Performa 7 hari terakhir</p>
-                </div>
-                <div class="flex space-x-2">
-                    <button
-                        class="px-3 py-1 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 rounded-lg">7H</button>
-                    <button
-                        class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">30H</button>
-                    <button
-                        class="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">90H</button>
-                </div>
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Grafik Pendapatan</h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Performa 7 hari terakhir</p>
             </div>
             <div class="relative h-80">
                 <canvas id="revenueChart"></canvas>
@@ -114,13 +104,13 @@
                                 </p>
                             </div>
                             <div
-                                class="w-8 h-8 rounded-lg flex items-center justify-center {{ $index === 0 ? 'bg-yellow-100 dark:bg-yellow-900/50' : ($index === 1 ? 'bg-gray-100 dark:bg-gray-600' : 'bg-orange-100 dark:bg-orange-900/50') }}">
+                                class="w-8 h-8 rounded-lg flex items-center font-semibold justify-center {{ $index === 0 ? 'bg-yellow-100 dark:bg-yellow-900/50' : ($index === 1 ? 'bg-gray-100 dark:bg-gray-600' : 'bg-orange-100 dark:bg-orange-900/50') }}">
                                 @if ($index === 0)
-                                    🏆
+                                    1
                                 @elseif($index === 1)
-                                    🥈
+                                    2
                                 @else
-                                    🥉
+                                    3
                                 @endif
                             </div>
                         </div>
