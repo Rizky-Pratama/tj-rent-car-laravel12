@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\JenisSewaController;
 use App\Http\Controllers\Admin\JadwalController;
 use App\Http\Controllers\Admin\TransaksiController;
 use App\Http\Controllers\Admin\PembayaranController;
+use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Api\MobilController as ApiMobilController;
 
@@ -27,8 +28,14 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    // Profile Management
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
     // User Management
-    Route::resource('users', UserController::class);
+    Route::resource('users', UserController::class)->middleware('can:viewAny,App\Models\User');
 
     // Pelanggan Management
     Route::resource('pelanggan', PelangganController::class);
